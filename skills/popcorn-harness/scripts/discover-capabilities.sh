@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # discover-capabilities.sh — Discover available skills, agents, and commands.
 # Outputs structured JSON to stdout. Silently skips unavailable sources.
+# Compatible with bash 3.x (macOS default) and bash 4+.
 #
 # Usage: bash discover-capabilities.sh [--platform claude-code|hermes|openclaw]
 # Output: {"skills":[...],"agents":[...],"commands":[...],"sources":[...],"errors":[...]}
@@ -10,16 +11,37 @@ set -uo pipefail
 PLATFORM=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --platform) PLATFORM="${2:-}"; shift 2 ;;
+    --platform)
+      if [[ $# -lt 2 ]]; then
+        printf '{"error":"--platform requires a value"}\n' >&2; exit 1
+      fi
+      PLATFORM="${2}"; shift 2 ;;
     *) shift ;;
   esac
 done
 
-if [ -z "$PLATFORM" ]; then
+if [[ -z "$PLATFORM" ]]; then
   SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-  detection="$(bash "$SCRIPT_DIR/detect-platform.sh" 2>/dev/null || echo '{"platform":"hermes"}')"
-  PLATFORM="$(echo "$detection" | grep -o '"platform":"[^"]*"' | cut -d'"' -f4)"
+  detection="$(bash "$SCRIPT_DIR/detect-platform.sh" 2>/dev/null || printf '{"platform":"hermes"}')"
+  PLATFORM="$(printf '%s' "$detection" | grep -o '"platform":"[^"]*"' | cut -d'"' -f4)"
 fi
+
+# JSON-safe string escaping (no jq dependency, bash 3.x compatible)
+json_escape() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  printf '%s' "$s"
+}
+
+# Dedup tracking via tmp file (bash 3.x: no associative arrays)
+TMPDIR_DEDUP="$(mktemp -d)"
+trap 'rm -rf "$TMPDIR_DEDUP"' EXIT
+_seen_file="$TMPDIR_DEDUP/seen"
+touch "$_seen_file"
+
+is_seen() { grep -qxF "$1:$2" "$_seen_file" 2>/dev/null; }
+mark_seen() { printf '%s:%s\n' "$1" "$2" >> "$_seen_file"; }
 
 SKILLS=()
 AGENTS=()
@@ -27,95 +49,112 @@ COMMANDS=()
 SOURCES=()
 ERRORS=()
 
-# Helper: add item to array as JSON string
-add_skill() { SKILLS+=("$(printf '{"name":"%s","source":"%s"}' "$1" "$2")"); }
-add_agent() { AGENTS+=("$(printf '{"name":"%s","source":"%s"}' "$1" "$2")"); }
-add_cmd()   { COMMANDS+=("$(printf '{"name":"%s","source":"%s"}' "$1" "$2")"); }
+add_skill() {
+  local name; name="$(json_escape "$1")"
+  local src;  src="$(json_escape "$2")"
+  is_seen "skill" "$name" && return 0
+  mark_seen "skill" "$name"
+  SKILLS+=("{\"name\":\"$name\",\"source\":\"$src\"}")
+}
+add_agent() {
+  local name; name="$(json_escape "$1")"
+  local src;  src="$(json_escape "$2")"
+  is_seen "agent" "$name" && return 0
+  mark_seen "agent" "$name"
+  AGENTS+=("{\"name\":\"$name\",\"source\":\"$src\"}")
+}
+add_cmd() {
+  local name; name="$(json_escape "$1")"
+  local src;  src="$(json_escape "$2")"
+  is_seen "cmd" "$name" && return 0
+  mark_seen "cmd" "$name"
+  COMMANDS+=("{\"name\":\"$name\",\"source\":\"$src\"}")
+}
 
 # ─── Claude Code discovery ───────────────────────────────────────────────────
-if [ "$PLATFORM" = "claude-code" ]; then
+if [[ "$PLATFORM" == "claude-code" ]]; then
 
   # Agents via CLI (primary)
   if command -v claude > /dev/null 2>&1; then
+    agents_before=${#AGENTS[@]}
     while IFS= read -r line; do
-      [ -z "$line" ] && continue
+      [[ -z "$line" ]] && continue
       add_agent "$line" "claude-cli"
     done < <(claude agents 2>/dev/null || true)
-    SOURCES+=("claude-agents-cli")
+    [[ ${#AGENTS[@]} -gt $agents_before ]] && SOURCES+=("claude-agents-cli")
   fi
 
   # Agents via filesystem (fallback + supplement)
   for agents_dir in "$HOME/.claude/agents" "./agents" ".claude/agents"; do
-    if [ -d "$agents_dir" ]; then
-      while IFS= read -r f; do
-        name="$(basename "$f" .md)"
-        add_agent "$name" "fs:$agents_dir"
-      done < <(find "$agents_dir" -name "*.md" -not -name ".*" 2>/dev/null || true)
-      SOURCES+=("agents-dir:$agents_dir")
-    fi
+    [[ -d "$agents_dir" ]] || continue
+    agents_before=${#AGENTS[@]}
+    while IFS= read -r f; do
+      add_agent "$(basename "$f" .md)" "fs:$agents_dir"
+    done < <(find "$agents_dir" -maxdepth 2 -name "*.md" -not -name ".*" 2>/dev/null || true)
+    [[ ${#AGENTS[@]} -gt $agents_before ]] && SOURCES+=("agents-dir:$(json_escape "$agents_dir")")
   done
 
-  # Skills
-  for skills_dir in \
-    "$HOME/.claude/plugins/marketplaces/ecc/skills" \
-    "$HOME/.claude/skills" \
-    ".claude/skills"
-  do
-    if [ -d "$skills_dir" ]; then
-      while IFS= read -r d; do
-        name="$(basename "$d")"
-        [ -f "$d/SKILL.md" ] && add_skill "$name" "fs:$skills_dir"
-      done < <(find "$skills_dir" -maxdepth 1 -mindepth 1 -type d 2>/dev/null || true)
-      SOURCES+=("skills-dir:$skills_dir")
-    fi
-  done
+  # Skills — ECC marketplace, user-level, project-level, all plugin skills
+  while IFS= read -r skills_dir; do
+    [[ -d "$skills_dir" ]] || continue
+    skills_before=${#SKILLS[@]}
+    while IFS= read -r d; do
+      [[ -f "$d/SKILL.md" ]] && add_skill "$(basename "$d")" "fs:$skills_dir"
+    done < <(find "$skills_dir" -maxdepth 1 -mindepth 1 -type d 2>/dev/null || true)
+    [[ ${#SKILLS[@]} -gt $skills_before ]] && SOURCES+=("skills-dir:$(json_escape "$skills_dir")")
+  done < <(
+    printf '%s\n' \
+      "$HOME/.claude/plugins/marketplaces/ecc/skills" \
+      "$HOME/.claude/skills" \
+      ".claude/skills"
+    find "$HOME/.claude/plugins" -maxdepth 4 -type d -name "skills" 2>/dev/null || true
+  )
 
   # Commands
   for cmd_dir in "$HOME/.claude/commands" ".claude/commands"; do
-    if [ -d "$cmd_dir" ]; then
-      while IFS= read -r f; do
-        name="$(basename "$f" .md)"
-        add_cmd "$name" "fs:$cmd_dir"
-      done < <(find "$cmd_dir" -name "*.md" -not -name ".*" 2>/dev/null || true)
-      SOURCES+=("commands-dir:$cmd_dir")
-    fi
+    [[ -d "$cmd_dir" ]] || continue
+    cmds_before=${#COMMANDS[@]}
+    while IFS= read -r f; do
+      add_cmd "$(basename "$f" .md)" "fs:$cmd_dir"
+    done < <(find "$cmd_dir" -name "*.md" -not -name ".*" 2>/dev/null || true)
+    [[ ${#COMMANDS[@]} -gt $cmds_before ]] && SOURCES+=("commands-dir:$(json_escape "$cmd_dir")")
   done
 
-# ─── Hermes / OpenClaw discovery ─────────────────────────────────────────────
+# ─── Hermes / OpenClaw ────────────────────────────────────────────────────────
 else
-  # Hermes/OpenClaw: capabilities are injected via available_skills in system prompt.
-  # This script signals that to the LLM — actual extraction happens in SKILL.md logic.
   SOURCES+=("system-prompt-injection")
-  ERRORS+=("hermes-openclaw: read available_skills from context — cannot enumerate via script")
+  ERRORS+=("hermes-openclaw: capabilities are in available_skills context — read them from the injected system prompt, not this script.")
 fi
 
-# ─── Build output JSON ───────────────────────────────────────────────────────
-join_array() {
-  local arr=("$@")
+# ─── JSON output ─────────────────────────────────────────────────────────────
+join_obj_arr() {
+  # joins pre-encoded JSON objects
   local result="["
-  for i in "${!arr[@]}"; do
-    [ $i -gt 0 ] && result+=","
-    result+="${arr[$i]}"
+  local first=1
+  for v in "$@"; do
+    [[ $first -eq 0 ]] && result+=","
+    result+="$v"
+    first=0
   done
   result+="]"
-  echo "$result"
+  printf '%s' "$result"
 }
-
-str_array() {
-  local arr=("$@")
+join_str_arr() {
   local result="["
-  for i in "${!arr[@]}"; do
-    [ $i -gt 0 ] && result+=","
-    result+="\"${arr[$i]}\""
+  local first=1
+  for v in "$@"; do
+    [[ $first -eq 0 ]] && result+=","
+    result+="\"$(json_escape "$v")\""
+    first=0
   done
   result+="]"
-  echo "$result"
+  printf '%s' "$result"
 }
 
 printf '{"platform":"%s","skills":%s,"agents":%s,"commands":%s,"sources":%s,"errors":%s}\n' \
-  "$PLATFORM" \
-  "$(join_array "${SKILLS[@]+"${SKILLS[@]}"}")" \
-  "$(join_array "${AGENTS[@]+"${AGENTS[@]}"}")" \
-  "$(join_array "${COMMANDS[@]+"${COMMANDS[@]}"}")" \
-  "$(str_array "${SOURCES[@]+"${SOURCES[@]}"}")" \
-  "$(str_array "${ERRORS[@]+"${ERRORS[@]}"}")"
+  "$(json_escape "$PLATFORM")" \
+  "$(join_obj_arr "${SKILLS[@]+"${SKILLS[@]}"}")" \
+  "$(join_obj_arr "${AGENTS[@]+"${AGENTS[@]}"}")" \
+  "$(join_obj_arr "${COMMANDS[@]+"${COMMANDS[@]}"}")" \
+  "$(join_str_arr "${SOURCES[@]+"${SOURCES[@]}"}")" \
+  "$(join_str_arr "${ERRORS[@]+"${ERRORS[@]}"}")"

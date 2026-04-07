@@ -5,8 +5,6 @@ description: >-
   commands on the current platform, reasons about the optimal combination, and
   executes with progressive disclosure. Works on Claude Code, Hermes, and
   OpenClaw. Trigger on: "popcorn", "assemble harness for", or "use your skills to".
-origin: community
-version: 0.3.0
 ---
 
 # Popcorn Harness
@@ -20,7 +18,13 @@ Given a task, pop the right capabilities together and execute — no manual tool
 - [references/assembly-patterns.md](references/assembly-patterns.md) — execution graph patterns and parallel dispatch mechanics
 - [scripts/detect-platform.sh](scripts/detect-platform.sh) — deterministic platform detection (outputs JSON)
 - [scripts/discover-capabilities.sh](scripts/discover-capabilities.sh) — capability discovery across all sources (outputs JSON)
-- [agents/popcorn-critic.md](agents/popcorn-critic.md) — post-execution quality reviewer
+
+**Note on SKILL_DIR:** When scripts are referenced below, `SKILL_DIR` refers to the directory containing this SKILL.md. Common locations:
+- `~/.claude/plugins/popcorn-harness/skills/popcorn-harness/`
+- `~/.claude/skills/popcorn-harness/`
+- `~/.hermes/skills/popcorn-harness/`
+
+Set it before running any script: `SKILL_DIR=~/.claude/plugins/popcorn-harness/skills/popcorn-harness`
 
 ---
 
@@ -39,11 +43,13 @@ Given a task, pop the right capabilities together and execute — no manual tool
 Run the detection script first. It outputs JSON.
 
 ```bash
-bash "$(dirname "$0")/scripts/detect-platform.sh"
+bash "$SKILL_DIR/scripts/detect-platform.sh"
 # → {"platform":"claude-code","scope":"project","evidence":[...]}
 ```
 
-If the script is unavailable (Hermes/OpenClaw context), use the fallback table:
+**Windows users:** bash scripts require WSL2 or Git Bash. If unavailable, skip the script and use the fallback table directly.
+
+If the script is unavailable (Hermes/OpenClaw context or no bash), use the fallback table:
 
 | Signal | Platform |
 |--------|----------|
@@ -63,7 +69,7 @@ If the script is unavailable (Hermes/OpenClaw context), use the fallback table:
 Run the discovery script:
 
 ```bash
-bash "$(dirname "$0")/scripts/discover-capabilities.sh" --platform claude-code
+bash "$SKILL_DIR/scripts/discover-capabilities.sh" --platform claude-code
 # → {"skills":[...],"agents":[...],"commands":[...],"sources":[...],"errors":[...]}
 ```
 
@@ -129,6 +135,16 @@ Proceed? [y / n / adjust]
 ```
 
 **Mid-execution escalation:** if a capability output reveals new required capabilities, see [references/tier-decision-tree.md](references/tier-decision-tree.md) § Tier Escalation.
+
+### Adjust Flow (when user says "adjust" at Tier 2 or Tier 3)
+
+1. Re-display the current harness as a numbered list
+2. Ask: "Which capabilities to add, remove, or reorder? (e.g. 'remove 2, add docker-patterns')"
+3. Apply the requested change — validate the result is still within budget (≤5)
+4. Re-display the revised harness and ask "Proceed? [y / n / adjust]"
+5. Repeat until user confirms with `y` or cancels with `n`
+
+If user says "adjust" but provides no specifics: ask "What would you like to change? You can add, remove, or reorder capabilities."
 
 ---
 

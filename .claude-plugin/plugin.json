@@ -1,0 +1,21 @@
+{
+  "name": "popcorn-harness",
+  "description": "Instant on-the-fly harness assembler. Discovers available skills, agents, and commands across Claude Code, Hermes, and OpenClaw \u2014 pops them together to execute any task.",
+  "version": "0.3.0",
+  "author": {
+    "name": "seilk",
+    "email": ""
+  },
+  "homepage": "https://github.com/seilk/popcorn-harness",
+  "repository": "https://github.com/seilk/popcorn-harness",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "agents",
+    "harness",
+    "orchestrator",
+    "cross-platform",
+    "hermes",
+    "openclaw"
+  ]
+}

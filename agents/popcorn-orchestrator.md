@@ -5,14 +5,8 @@ description: |
   commands on the fly. The orchestrator discovers available capabilities,
   assembles the optimal harness, and executes with progressive disclosure.
   Examples:
-  <example>
-    user: "popcorn — prep this repo for production"
-    assistant: uses popcorn-orchestrator to discover and assemble relevant capabilities
-  </example>
-  <example>
-    user: "assemble whatever skills you need to audit this codebase"
-    assistant: delegates to popcorn-orchestrator for dynamic capability composition
-  </example>
+  <example>Context: The user wants to prepare a project for production deployment and needs multiple checks run. user: "popcorn — prep this repo for production" assistant: "I'll use the popcorn-orchestrator to discover available capabilities and assemble the right harness for production readiness." <commentary>Since the task spans multiple domains (security, testing, deployment), use popcorn-orchestrator for dynamic capability composition.</commentary></example>
+  <example>Context: The user has a complex codebase audit task and wants the agent to self-compose its approach. user: "assemble whatever skills you need to audit this codebase" assistant: "Let me use popcorn-orchestrator to discover what capabilities are available and build the optimal harness for this audit." <commentary>Open-ended task with multiple possible capability combinations — ideal for popcorn-orchestrator's dynamic assembly.</commentary></example>
 model: inherit
 ---
 

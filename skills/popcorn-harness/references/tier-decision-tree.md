@@ -65,6 +65,28 @@ Trigger mid-execution tier escalation when:
 → Report: "No matching capabilities found for: [task]"
 → Suggest: install relevant skill, or rephrase task
 
+**Single-word task (e.g. "security"):**
+→ Single word with multiple domain interpretations → force Tier 3
+→ Ask: "Which aspect of [word]? e.g.: [list 2-3 inferred domains]"
+→ Example: "security" → "Network/auth security? Dependency CVE scan? Secret scanning?"
+→ Do NOT assume a single interpretation silently
+
+**Large discovery result (200+ skills):**
+→ Tier selection still works — use description-match quality, not count
+→ Group discovered capabilities by domain before presenting (reduces cognitive load)
+→ In Tier 3, show top 10 most-relevant instead of full list; note "X more available"
+
+**Subagent timeout mid-execution:**
+→ Log: "[skill-name]: timed out after [N]s"
+→ Continue with remaining capabilities
+→ Include in Skipped section of output
+→ Do NOT re-run the timed-out capability automatically
+
+**0 capabilities remain after pruning:**
+→ Do NOT proceed with empty harness
+→ Report: "All mapped capabilities were pruned due to budget or overlap. Please narrow the task or specify capabilities directly."
+→ Offer to re-run with user-specified capability list
+
 **Task maps to exactly 5 capabilities and all are equally relevant:**
 → Tier 3, present all 5, do not prune without reason
 → Confirm before proceeding (5 is at the budget ceiling)

@@ -34,7 +34,7 @@ Parallel information gathering, then sequential action.
 
 ```
 [capability-A] ─┐
-[capability-B] ─┼──► [sync point] ──► [capability-C] ──► [capability-D]
+[capability-B] ─┼──► [sync point] ──► [capability-D] ──► [capability-E]
 [capability-C] ─┘
 ```
 

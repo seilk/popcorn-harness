@@ -39,10 +39,17 @@ if [ "$PLATFORM" != "claude-code" ]; then
 fi
 
 # --- Build JSON evidence array ---
+json_escape() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  printf '%s' "$s"
+}
+
 EVIDENCE_JSON="["
 for i in "${!EVIDENCE[@]}"; do
-  [ $i -gt 0 ] && EVIDENCE_JSON+=","
-  EVIDENCE_JSON+="\"${EVIDENCE[$i]}\""
+  [ "$i" -gt 0 ] && EVIDENCE_JSON+=","
+  EVIDENCE_JSON+="\"$(json_escape "${EVIDENCE[$i]}")\""
 done
 EVIDENCE_JSON+="]"
 
