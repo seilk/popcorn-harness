@@ -1,0 +1,6 @@
+{
+  "name": "popcorn-harness",
+  "version": "0.1.0",
+  "description": "Instant on-the-fly harness assembler — discovers available skills, agents, and commands, then pops them together to execute any task.",
+  "type": "module"
+}
