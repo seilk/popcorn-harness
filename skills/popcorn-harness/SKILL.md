@@ -1,274 +1,208 @@
 ---
 name: popcorn-harness
 description: >-
-  Instant on-the-fly harness assembler. Given any task, discovers available
-  skills, agents, and commands across the current platform, reasons about the
-  best combination, and executes immediately. Works seamlessly across Claude
-  Code, Hermes, and OpenClaw. Trigger on: "popcorn", "assemble harness for",
-  "use available skills to", or any task where the user wants the agent to
-  self-compose its capabilities rather than manually selecting tools.
+  Instant on-the-fly harness assembler. Discovers available skills, agents, and
+  commands on the current platform, reasons about the optimal combination, and
+  executes with progressive disclosure. Works on Claude Code, Hermes, and
+  OpenClaw. Trigger on: "popcorn", "assemble harness for", or "use your skills to".
 origin: community
-version: 0.1.0
+version: 0.3.0
 ---
 
 # Popcorn Harness
 
 Given a task, pop the right capabilities together and execute — no manual tool selection needed.
 
-Inspired by ECC's `team-builder` (agent dispatch) and `agent-sort` (evidence-first classification). Popcorn Harness extends those ideas to skills, agents, and commands simultaneously, with progressive disclosure and cross-platform support.
+**Announce at start:** "🍿 Popping harness for: [task summary]"
+
+**Supporting files in this skill (load on demand):**
+- [references/tier-decision-tree.md](references/tier-decision-tree.md) — detailed tier selection logic and edge cases
+- [references/assembly-patterns.md](references/assembly-patterns.md) — execution graph patterns and parallel dispatch mechanics
+- [scripts/detect-platform.sh](scripts/detect-platform.sh) — deterministic platform detection (outputs JSON)
+- [scripts/discover-capabilities.sh](scripts/discover-capabilities.sh) — capability discovery across all sources (outputs JSON)
+- [agents/popcorn-critic.md](agents/popcorn-critic.md) — post-execution quality reviewer
 
 ---
 
 ## When to Use
 
 - User says "popcorn", "assemble harness for X", or "use your skills to do X"
-- Task touches multiple domains (e.g., security + testing + deployment)
-- You're unsure which skill combination is optimal and want to reason explicitly
-- User wants transparency into how you composed the execution
+- Task spans multiple domains and you want explicit reasoning about capability selection
+- User wants transparency into how the execution was composed
 
-**Do not use** when a single skill or tool clearly covers the task — just invoke that directly.
-
----
-
-## Progressive Disclosure Tiers
-
-Assess task complexity before acting. Choose the tier that matches:
-
-### Tier 1 — Quick Pop
-**When:** Task is clear, maps to 1-2 capabilities, no ambiguity.
-**Behavior:** Silently select capabilities, announce briefly, execute.
-```
-Popping: security-review + e2e-testing
-[executes immediately]
-```
-No plan display, no confirmation needed.
-
-### Tier 2 — Standard Pop
-**When:** Task spans 2-4 capabilities or has mild ambiguity.
-**Behavior:** Show assembled harness, pause briefly for correction, then execute.
-```
-Harness assembled:
-  1. research-ops     — gather context
-  2. security-review  — audit attack surface
-  3. deployment-patterns — generate deploy checklist
-
-Executing in 3s... (say "stop" to adjust)
-[executes]
-```
-
-### Tier 3 — Full Pop
-**When:** Task is complex, spans 5+ capabilities, or is ambiguous.
-**Behavior:** Full discovery display + explicit confirmation before execution.
-```
-Task: "prepare this app for production"
-
-Discovered capabilities:
-  Skills:  security-review, e2e-testing, seo, deployment-patterns, docker-patterns
-  Agents:  security-engineer (if Claude Code)
-  Commands: /review, /deploy (if Claude Code)
-
-Proposed harness:
-  Phase 1 (parallel): security-review + e2e-testing + seo
-  Phase 2 (sequential): deployment-patterns → docker-patterns
-
-Proceed? [y/n/adjust]
-```
-
-Tier escalates automatically if discovery reveals unexpected complexity.
+**Skip this skill** when a single skill clearly covers the task — invoke it directly.
 
 ---
 
-## Platform Detection
+## Step 0 — Detect Platform
 
-Run this check at the start of every invocation. The platform determines the discovery strategy.
+Run the detection script first. It outputs JSON.
 
 ```bash
-# Detect Claude Code
-which claude > /dev/null 2>&1 && echo "claude-code" || echo "not-claude-code"
-ls .claude/ > /dev/null 2>&1 && echo "project-claude" || true
+bash "$(dirname "$0")/scripts/detect-platform.sh"
+# → {"platform":"claude-code","scope":"project","evidence":[...]}
 ```
+
+If the script is unavailable (Hermes/OpenClaw context), use the fallback table:
 
 | Signal | Platform |
 |--------|----------|
-| `claude` CLI available + `.claude/` exists | Claude Code (project) |
-| `claude` CLI available, no `.claude/` | Claude Code (user-level) |
-| `available_skills` injected in system prompt, no `claude` CLI | Hermes / Fox |
-| `available_skills` injected + OpenClaw context | OpenClaw |
+| `claude` CLI in PATH + `.claude/` dir exists | Claude Code (project) |
+| `claude` CLI in PATH, no `.claude/` dir | Claude Code (user) |
+| `available_skills` in system prompt, no `claude` CLI | Hermes / Fox |
+| Above + `OPENCLAW` env var set | OpenClaw |
+
+**Ambiguous detection → default to Hermes (context-based). Never halt.**
 
 ---
 
-## Capability Discovery by Platform
+## Step 1 — Discover Capabilities
 
 ### Claude Code
 
-Run all three in parallel:
+Run the discovery script:
 
 ```bash
-# 1. Agents
-claude agents 2>/dev/null
-
-# 2. Skills (ECC external_dirs + local)
-ls ~/.claude/plugins/marketplaces/ecc/skills/ 2>/dev/null
-ls .claude/skills/ 2>/dev/null
-
-# 3. Commands
-ls ~/.claude/commands/ 2>/dev/null
-ls .claude/commands/ 2>/dev/null
+bash "$(dirname "$0")/scripts/discover-capabilities.sh" --platform claude-code
+# → {"skills":[...],"agents":[...],"commands":[...],"sources":[...],"errors":[...]}
 ```
 
-Parse agents output:
-- `plugin-name:agent-name` → domain = plugin-name
-- bare name → read from `~/.claude/agents/` or `./agents/`
+Read the JSON output. The `errors` field lists what failed — surface it if critical.
 
-Priority: user agents > plugin agents > built-in agents (skip built-ins unless requested)
+**Zero results protocol:** report "No capabilities found via [sources]. Check installation." and halt. Do not proceed with an empty harness.
 
 ### Hermes / Fox / OpenClaw
 
-Available capabilities are already injected as `available_skills` in the system prompt.
-No CLI discovery needed. Read from context directly.
+Capabilities are already present in `available_skills` (injected in system prompt). Extract:
+1. All skill names + one-line descriptions from the injected block
+2. Categories (the indented structure)
+3. Active MCP tools in the current session
 
-Extract skill names and descriptions from the injected list. Group by category if available.
-MCP tools in the current session are also available capabilities — include them.
-
----
-
-## Harness Assembly Logic
-
-After discovery, map capabilities to the task using this reasoning model:
-
-### Step 1: Task Decomposition
-Break the task into sub-goals (2-6 typically). Each sub-goal should be independently addressable.
-
-### Step 2: Capability Mapping
-For each sub-goal, find the best matching capability:
-- Prefer specific skills over generic ones
-- Prefer skills with descriptions that explicitly cover the sub-goal
-- On Claude Code: agents for persona-driven work, skills for procedural how-to, commands for workflow entry points
-- On Hermes: skills for procedural guidance, MCP tools for live data/actions
-
-### Step 3: Execution Graph
-Decide ordering:
-- **Parallel**: sub-goals with no shared state or output dependency
-- **Sequential**: sub-goal B depends on output of sub-goal A
-- **Hybrid**: parallel phases separated by sync points
-
-```
-Example:
-  [security-review]──┐
-                     ├──► [deployment-checklist]──► [execute-deploy]
-  [e2e-testing]──────┘
-```
-
-### Step 4: Context Budget Check
-Count selected capabilities. If > 5, flag and ask user to narrow scope.
-Loading too many skills simultaneously degrades quality (per ECC agent-harness-construction pattern).
+**Zero results protocol:** same as above — report and halt.
 
 ---
 
-## Execution
+## Step 2 — Choose Tier
 
-### On Claude Code
+Assess task complexity after discovery. For detailed edge cases, load [references/tier-decision-tree.md](references/tier-decision-tree.md).
 
-Load each skill via the skill loading mechanism, then dispatch:
-- Skills: load SKILL.md content into context
-- Agents: spawn via subagent with agent file as system prompt
-- Parallel execution: use parallel Agent tool calls (same pattern as team-builder)
+**Quick reference (exclusive boundaries):**
 
-### On Hermes / OpenClaw
+| Condition | Tier |
+|-----------|------|
+| Exactly 1 capability, task unambiguous | **Tier 1 — Quick Pop** |
+| 2-3 capabilities, OR 1 with mild ambiguity | **Tier 2 — Standard Pop** |
+| 4-5 capabilities, OR significant ambiguity | **Tier 3 — Full Pop** |
 
-Load each skill via `skill_view(name)`, then follow its instructions.
-For parallel work, use `delegate_task` with isolated subagent contexts.
-Announce which skill is active at each phase.
+### Tier 1 — Quick Pop
+Announce, execute immediately. No confirmation.
+```
+🍿 Popping: security-review
+[executes]
+```
+
+### Tier 2 — Standard Pop
+Show plan. Wait for explicit confirmation before executing.
+```
+🍿 Harness assembled:
+  1. research-ops        — gather context
+  2. security-review     — audit attack surface
+  3. deployment-patterns — generate deploy checklist
+
+Proceed? [y / n / adjust]
+```
+
+### Tier 3 — Full Pop
+Show full discovery + plan + pruning rationale. Require explicit confirmation.
+```
+🍿 Discovered (Claude Code):
+  Skills:  security-review, e2e-testing, seo, deployment-patterns, docker-patterns
+  Agents:  security-engineer
+  Commands: /review
+
+Assembled harness (5 of 7):
+  Phase 1 (parallel): security-review + e2e-testing + seo
+  Phase 2 (sequential): deployment-patterns → docker-patterns
+  Pruned: security-engineer (overlaps security-review), /review (redundant)
+
+Proceed? [y / n / adjust]
+```
+
+**Mid-execution escalation:** if a capability output reveals new required capabilities, see [references/tier-decision-tree.md](references/tier-decision-tree.md) § Tier Escalation.
 
 ---
 
-## Output Format
+## Step 3 — Assemble Harness
 
-Always end with a synthesis section regardless of tier:
+For full graph patterns and parallel dispatch mechanics, load [references/assembly-patterns.md](references/assembly-patterns.md).
+
+**Quick reference:**
+
+1. **Decompose** task into 2-6 independent sub-goals
+2. **Map** each sub-goal to a capability — match on description content, not name alone
+3. **Graph** execution order: parallel if no shared state, sequential if B needs A's output
+4. **Enforce budget:** hard cap of 5 capabilities. If exceeded, prune lowest-relevance and report.
+
+---
+
+## Step 4 — Execute
+
+### Claude Code
+
+- **Skills:** read `SKILL.md` into context via file read tool, then follow its instructions
+- **Agents:** spawn via Agent tool (`subagent_type: "general-purpose"`) with agent `.md` as system prompt
+- **Parallel:** spawn all Phase 1 agents simultaneously — do NOT await one before starting another
+- Full parallel dispatch syntax: see [references/assembly-patterns.md](references/assembly-patterns.md) § Parallel Dispatch
+
+### Hermes / Fox / OpenClaw
+
+- **Skills:** `skill_view(name="<skill-name>")` — load then follow
+- **Parallel:** `delegate_task(tasks=[...])` — pass ALL context per subagent (no shared memory)
+- **Announce** before each capability: "Running: <skill-name>"
+
+---
+
+## Step 5 — Output
 
 ```
---- Popcorn Harness Results ---
+--- 🍿 Popcorn Harness: [task summary] ---
+Platform: [detected]  |  Tier: [1/2/3] — [Quick/Standard/Full] Pop
 
 [Phase 1]
-  security-review: [summary]
-  e2e-testing: [summary]
+  <skill>: [findings]
+  <skill>: [findings]
 
 [Phase 2]
-  deployment-patterns: [checklist]
+  <skill>: [findings]
 
---- Synthesis ---
-  Agreements: [...]
-  Conflicts: [...]
-  Next steps: [...]
+--- Summary ---
+  Key findings:  [what matters most across all outputs]
+  Action items:  [concrete, specific next steps]
+  Skipped:       [any failures or pruned capabilities, with reason]
 ```
 
-For Tier 1, synthesis can be a single paragraph.
+**Optional post-execution review:** spawn [agents/popcorn-critic.md](agents/popcorn-critic.md) with the above output + original task to get a quality verdict.
 
 ---
 
 ## Rules
 
-- Never hardcode skill lists. Always discover dynamically.
-- Announce the platform detected and capabilities found (Tier 2+).
-- If a required capability is missing, say so explicitly rather than silently degrading.
-- Max 5 capabilities per harness. Enforce at assembly time.
-- Escalate tier if task complexity grows during execution.
-- On error in one capability, note it inline and continue with remaining.
+1. Detect platform (Step 0) before anything else.
+2. Never hardcode skill lists — always discover dynamically.
+3. Announce platform and assembled harness at Tier 2+.
+4. Zero discovery results → halt and report. Do not hallucinate capabilities.
+5. Hard cap: 5 capabilities. Prune explicitly with stated reason.
+6. Missing capability → report it, continue with what's available.
+7. Capability error → log inline, continue with remaining.
+8. Auto-execution without confirmation is only allowed at Tier 1.
 
 ---
 
 ## Anti-Patterns
 
-- Loading all available skills "just in case" — this floods context and reduces quality
-- Picking skills by name-matching alone without reading descriptions
-- Running everything sequentially when parallel is possible
-- Skipping synthesis when multiple capabilities were used
-- Assuming Claude Code is available when running inside Hermes
-
----
-
-## Examples
-
-### Hermes / Fox
-
-```
-User: popcorn — review my portfolio vault and suggest improvements
-
-Fox detects: Hermes platform
-Discovers: obsidian-finance-vault, tossctl, market-research (from available_skills)
-Tier: 2 — Standard Pop
-
-Harness assembled:
-  1. obsidian-finance-vault — read current vault structure
-  2. tossctl               — fetch live portfolio data
-  3. market-research       — benchmark against market context
-Executing...
-```
-
-### Claude Code
-
-```
-User: popcorn — get this Next.js app ready for production
-
-Detects: Claude Code (project), .claude/ found
-Discovers:
-  Skills: security-review, e2e-testing, seo, deployment-patterns
-  Agents: security-engineer
-  Commands: /review
-Tier: 3 — Full Pop (5 capabilities)
-
-Proposed harness:
-  Phase 1 (parallel): security-engineer + e2e-testing + seo
-  Phase 2: deployment-patterns
-Proceed?
-```
-
----
-
-## References
-
-- ECC `team-builder` — agent discovery and parallel dispatch pattern
-- ECC `agent-sort` — evidence-first capability classification
-- ECC `agent-harness-construction` — action space design, context budget rules
-- Superpowers `brainstorming` — progressive disclosure and tier escalation
-- Superpowers `writing-plans` — phase decomposition and synthesis format
+- Loading all available skills "just in case" — floods context, degrades output quality
+- Selecting capabilities by name-match without reading descriptions
+- Running all capabilities sequentially when parallel is safe
+- Skipping the Summary block when multiple capabilities ran
+- Assuming Claude Code environment inside Hermes or OpenClaw
+- Swallowing discovery script errors silently
