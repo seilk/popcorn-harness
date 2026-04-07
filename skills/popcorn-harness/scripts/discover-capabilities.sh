@@ -75,11 +75,21 @@ add_cmd() {
 if [[ "$PLATFORM" == "claude-code" ]]; then
 
   # Agents via CLI (primary)
+  # Output format: "  agent-name · model" with header lines like "User agents:"
   if command -v claude > /dev/null 2>&1; then
     agents_before=${#AGENTS[@]}
     while IFS= read -r line; do
+      # ltrim whitespace
+      line="${line#"${line%%[![:space:]]*}"}"
+      # skip empty lines, count lines ("N active agents"), header lines ending with ":"
       [[ -z "$line" ]] && continue
-      add_agent "$line" "claude-cli"
+      [[ "$line" =~ ^[0-9]+\ active ]] && continue
+      [[ "$line" == *":" ]] && continue
+      # strip " · model" suffix and any trailing whitespace
+      name="${line%% ·*}"
+      name="${name%% }"
+      [[ -z "$name" ]] && continue
+      add_agent "$name" "claude-cli"
     done < <(claude agents 2>/dev/null || true)
     [[ ${#AGENTS[@]} -gt $agents_before ]] && SOURCES+=("claude-agents-cli")
   fi
