@@ -1,0 +1,405 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" width="960" height="280" shape-rendering="crispEdges">
+  <defs>
+    <style>
+      
+      @keyframes checkIn1 { 0%,20% { opacity:0; } 30%,100% { opacity:1; } }
+      @keyframes checkIn2 { 0%,35% { opacity:0; } 45%,100% { opacity:1; } }
+      @keyframes checkIn3 { 0%,50% { opacity:0; } 60%,100% { opacity:1; } }
+      @keyframes checkIn4 { 0%,65% { opacity:0; } 75%,100% { opacity:1; } }
+      @keyframes checkIn5 { 0%,80% { opacity:0; } 90%,100% { opacity:1; } }
+      @keyframes arrowPulse { 0%,100% { opacity:0.35; } 50% { opacity:0.7; } }
+      
+      @keyframes orbit0 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(26.8px, 5.3px); }
+  12.5% { transform: translate(49.5px, 20.5px); }
+  18.8% { transform: translate(64.7px, 43.2px); }
+  25.0% { transform: translate(70.0px, 70.0px); }
+  31.2% { transform: translate(64.7px, 96.8px); }
+  37.5% { transform: translate(49.5px, 119.5px); }
+  43.8% { transform: translate(26.8px, 134.7px); }
+  50.0% { transform: translate(0.0px, 140.0px); }
+  56.2% { transform: translate(-26.8px, 134.7px); }
+  62.5% { transform: translate(-49.5px, 119.5px); }
+  68.8% { transform: translate(-64.7px, 96.8px); }
+  75.0% { transform: translate(-70.0px, 70.0px); }
+  81.2% { transform: translate(-64.7px, 43.2px); }
+  87.5% { transform: translate(-49.5px, 20.5px); }
+  93.8% { transform: translate(-26.8px, 5.3px); }
+  100.0% { transform: translate(-0.0px, 0.0px); }
+}
+@keyframes orbit1 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(15.2px, 22.7px); }
+  12.5% { transform: translate(20.5px, 49.5px); }
+  18.8% { transform: translate(15.2px, 76.3px); }
+  25.0% { transform: translate(0.0px, 99.0px); }
+  31.2% { transform: translate(-22.7px, 114.2px); }
+  37.5% { transform: translate(-49.5px, 119.5px); }
+  43.8% { transform: translate(-76.3px, 114.2px); }
+  50.0% { transform: translate(-99.0px, 99.0px); }
+  56.2% { transform: translate(-114.2px, 76.3px); }
+  62.5% { transform: translate(-119.5px, 49.5px); }
+  68.8% { transform: translate(-114.2px, 22.7px); }
+  75.0% { transform: translate(-99.0px, 0.0px); }
+  81.2% { transform: translate(-76.3px, -15.2px); }
+  87.5% { transform: translate(-49.5px, -20.5px); }
+  93.8% { transform: translate(-22.7px, -15.2px); }
+  100.0% { transform: translate(-0.0px, -0.0px); }
+}
+@keyframes orbit2 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(-5.3px, 26.8px); }
+  12.5% { transform: translate(-20.5px, 49.5px); }
+  18.8% { transform: translate(-43.2px, 64.7px); }
+  25.0% { transform: translate(-70.0px, 70.0px); }
+  31.2% { transform: translate(-96.8px, 64.7px); }
+  37.5% { transform: translate(-119.5px, 49.5px); }
+  43.8% { transform: translate(-134.7px, 26.8px); }
+  50.0% { transform: translate(-140.0px, 0.0px); }
+  56.2% { transform: translate(-134.7px, -26.8px); }
+  62.5% { transform: translate(-119.5px, -49.5px); }
+  68.8% { transform: translate(-96.8px, -64.7px); }
+  75.0% { transform: translate(-70.0px, -70.0px); }
+  81.2% { transform: translate(-43.2px, -64.7px); }
+  87.5% { transform: translate(-20.5px, -49.5px); }
+  93.8% { transform: translate(-5.3px, -26.8px); }
+  100.0% { transform: translate(0.0px, -0.0px); }
+}
+@keyframes orbit3 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(-22.7px, 15.2px); }
+  12.5% { transform: translate(-49.5px, 20.5px); }
+  18.8% { transform: translate(-76.3px, 15.2px); }
+  25.0% { transform: translate(-99.0px, 0.0px); }
+  31.2% { transform: translate(-114.2px, -22.7px); }
+  37.5% { transform: translate(-119.5px, -49.5px); }
+  43.8% { transform: translate(-114.2px, -76.3px); }
+  50.0% { transform: translate(-99.0px, -99.0px); }
+  56.2% { transform: translate(-76.3px, -114.2px); }
+  62.5% { transform: translate(-49.5px, -119.5px); }
+  68.8% { transform: translate(-22.7px, -114.2px); }
+  75.0% { transform: translate(-0.0px, -99.0px); }
+  81.2% { transform: translate(15.2px, -76.3px); }
+  87.5% { transform: translate(20.5px, -49.5px); }
+  93.8% { transform: translate(15.2px, -22.7px); }
+  100.0% { transform: translate(0.0px, -0.0px); }
+}
+@keyframes orbit4 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(-26.8px, -5.3px); }
+  12.5% { transform: translate(-49.5px, -20.5px); }
+  18.8% { transform: translate(-64.7px, -43.2px); }
+  25.0% { transform: translate(-70.0px, -70.0px); }
+  31.2% { transform: translate(-64.7px, -96.8px); }
+  37.5% { transform: translate(-49.5px, -119.5px); }
+  43.8% { transform: translate(-26.8px, -134.7px); }
+  50.0% { transform: translate(-0.0px, -140.0px); }
+  56.2% { transform: translate(26.8px, -134.7px); }
+  62.5% { transform: translate(49.5px, -119.5px); }
+  68.8% { transform: translate(64.7px, -96.8px); }
+  75.0% { transform: translate(70.0px, -70.0px); }
+  81.2% { transform: translate(64.7px, -43.2px); }
+  87.5% { transform: translate(49.5px, -20.5px); }
+  93.8% { transform: translate(26.8px, -5.3px); }
+  100.0% { transform: translate(0.0px, 0.0px); }
+}
+@keyframes orbit5 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(-15.2px, -22.7px); }
+  12.5% { transform: translate(-20.5px, -49.5px); }
+  18.8% { transform: translate(-15.2px, -76.3px); }
+  25.0% { transform: translate(-0.0px, -99.0px); }
+  31.2% { transform: translate(22.7px, -114.2px); }
+  37.5% { transform: translate(49.5px, -119.5px); }
+  43.8% { transform: translate(76.3px, -114.2px); }
+  50.0% { transform: translate(99.0px, -99.0px); }
+  56.2% { transform: translate(114.2px, -76.3px); }
+  62.5% { transform: translate(119.5px, -49.5px); }
+  68.8% { transform: translate(114.2px, -22.7px); }
+  75.0% { transform: translate(99.0px, -0.0px); }
+  81.2% { transform: translate(76.3px, 15.2px); }
+  87.5% { transform: translate(49.5px, 20.5px); }
+  93.8% { transform: translate(22.7px, 15.2px); }
+  100.0% { transform: translate(0.0px, 0.0px); }
+}
+@keyframes orbit6 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(5.3px, -26.8px); }
+  12.5% { transform: translate(20.5px, -49.5px); }
+  18.8% { transform: translate(43.2px, -64.7px); }
+  25.0% { transform: translate(70.0px, -70.0px); }
+  31.2% { transform: translate(96.8px, -64.7px); }
+  37.5% { transform: translate(119.5px, -49.5px); }
+  43.8% { transform: translate(134.7px, -26.8px); }
+  50.0% { transform: translate(140.0px, -0.0px); }
+  56.2% { transform: translate(134.7px, 26.8px); }
+  62.5% { transform: translate(119.5px, 49.5px); }
+  68.8% { transform: translate(96.8px, 64.7px); }
+  75.0% { transform: translate(70.0px, 70.0px); }
+  81.2% { transform: translate(43.2px, 64.7px); }
+  87.5% { transform: translate(20.5px, 49.5px); }
+  93.8% { transform: translate(5.3px, 26.8px); }
+  100.0% { transform: translate(0.0px, 0.0px); }
+}
+@keyframes orbit7 {
+  0.0% { transform: translate(0.0px, 0.0px); }
+  6.2% { transform: translate(22.7px, -15.2px); }
+  12.5% { transform: translate(49.5px, -20.5px); }
+  18.8% { transform: translate(76.3px, -15.2px); }
+  25.0% { transform: translate(99.0px, -0.0px); }
+  31.2% { transform: translate(114.2px, 22.7px); }
+  37.5% { transform: translate(119.5px, 49.5px); }
+  43.8% { transform: translate(114.2px, 76.3px); }
+  50.0% { transform: translate(99.0px, 99.0px); }
+  56.2% { transform: translate(76.3px, 114.2px); }
+  62.5% { transform: translate(49.5px, 119.5px); }
+  68.8% { transform: translate(22.7px, 114.2px); }
+  75.0% { transform: translate(0.0px, 99.0px); }
+  81.2% { transform: translate(-15.2px, 76.3px); }
+  87.5% { transform: translate(-20.5px, 49.5px); }
+  93.8% { transform: translate(-15.2px, 22.7px); }
+  100.0% { transform: translate(0.0px, -0.0px); }
+}
+.orbit0 { animation: orbit0 24s linear infinite; }
+.orbit1 { animation: orbit1 24s linear infinite; }
+.orbit2 { animation: orbit2 24s linear infinite; }
+.orbit3 { animation: orbit3 24s linear infinite; }
+.orbit4 { animation: orbit4 24s linear infinite; }
+.orbit5 { animation: orbit5 24s linear infinite; }
+.orbit6 { animation: orbit6 24s linear infinite; }
+.orbit7 { animation: orbit7 24s linear infinite; }
+      .ck1 { animation: checkIn1 6s ease-out infinite; }
+      .ck2 { animation: checkIn2 6s ease-out infinite; }
+      .ck3 { animation: checkIn3 6s ease-out infinite; }
+      .ck4 { animation: checkIn4 6s ease-out infinite; }
+      .ck5 { animation: checkIn5 6s ease-out infinite; }
+      .arrow-pulse { animation: arrowPulse 2.5s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- ══ Background ══ -->
+  <rect width="960" height="280" fill="#08080e" rx="8"/>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 1: PIXEL ART KERNELS (x:40-185)  -->
+  <!-- ══════════════════════════════════════════ -->
+  <g >
+    <!-- Kernel: "sec" at (110,70) -->
+    <g class="orbit0"><g transform="translate(110,52)">
+      <rect x="8" y="0" width="4" height="4" fill="#E63946"/>
+      <rect x="4" y="4" width="4" height="4" fill="#FF6B6B"/><rect x="8" y="4" width="4" height="4" fill="#E63946"/><rect x="12" y="4" width="4" height="4" fill="#B22234"/>
+      <rect x="0" y="8" width="4" height="4" fill="#FF6B6B"/><rect x="4" y="8" width="4" height="4" fill="#E63946"/><rect x="8" y="8" width="4" height="4" fill="#E63946"/><rect x="12" y="8" width="4" height="4" fill="#B22234"/><rect x="16" y="8" width="4" height="4" fill="#8B1A2B"/>
+      <rect x="0" y="12" width="4" height="4" fill="#E63946"/><rect x="4" y="12" width="4" height="4" fill="#B22234"/><rect x="8" y="12" width="4" height="4" fill="#B22234"/><rect x="12" y="12" width="4" height="4" fill="#8B1A2B"/><rect x="16" y="12" width="4" height="4" fill="#8B1A2B"/>
+      <rect x="4" y="16" width="4" height="4" fill="#8B1A2B"/><rect x="8" y="16" width="4" height="4" fill="#8B1A2B"/><rect x="12" y="16" width="4" height="4" fill="#5A1018"/>
+      <rect x="8" y="20" width="4" height="4" fill="#5A1018"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#E63946" opacity="0.7" text-anchor="middle">sec</text>
+    </g></g>
+    <!-- Kernel: "test" at (159,90) -->
+    <g class="orbit1"><g transform="translate(159,72)">
+      <rect x="8" y="0" width="4" height="4" fill="#F5E6C8"/>
+      <rect x="4" y="4" width="4" height="4" fill="#FFF8E7"/><rect x="8" y="4" width="4" height="4" fill="#F5E6C8"/><rect x="12" y="4" width="4" height="4" fill="#D4A843"/>
+      <rect x="0" y="8" width="4" height="4" fill="#FFF8E7"/><rect x="4" y="8" width="4" height="4" fill="#F5E6C8"/><rect x="8" y="8" width="4" height="4" fill="#F5E6C8"/><rect x="12" y="8" width="4" height="4" fill="#D4A843"/><rect x="16" y="8" width="4" height="4" fill="#C4941A"/>
+      <rect x="0" y="12" width="4" height="4" fill="#F5E6C8"/><rect x="4" y="12" width="4" height="4" fill="#D4A843"/><rect x="8" y="12" width="4" height="4" fill="#D4A843"/><rect x="12" y="12" width="4" height="4" fill="#C4941A"/><rect x="16" y="12" width="4" height="4" fill="#C4941A"/>
+      <rect x="4" y="16" width="4" height="4" fill="#C4941A"/><rect x="8" y="16" width="4" height="4" fill="#C4941A"/><rect x="12" y="16" width="4" height="4" fill="#5A4510"/>
+      <rect x="8" y="20" width="4" height="4" fill="#5A4510"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#D4A843" opacity="0.7" text-anchor="middle">test</text>
+    </g></g>
+    <!-- Kernel: "deploy" at (180,140) -->
+    <g class="orbit2"><g transform="translate(180,122)">
+      <rect x="8" y="0" width="4" height="4" fill="#FF6B35"/>
+      <rect x="4" y="4" width="4" height="4" fill="#FF8C5A"/><rect x="8" y="4" width="4" height="4" fill="#FF6B35"/><rect x="12" y="4" width="4" height="4" fill="#CC5528"/>
+      <rect x="0" y="8" width="4" height="4" fill="#FF8C5A"/><rect x="4" y="8" width="4" height="4" fill="#FF6B35"/><rect x="8" y="8" width="4" height="4" fill="#FF6B35"/><rect x="12" y="8" width="4" height="4" fill="#CC5528"/><rect x="16" y="8" width="4" height="4" fill="#993F1E"/>
+      <rect x="0" y="12" width="4" height="4" fill="#FF6B35"/><rect x="4" y="12" width="4" height="4" fill="#CC5528"/><rect x="8" y="12" width="4" height="4" fill="#CC5528"/><rect x="12" y="12" width="4" height="4" fill="#993F1E"/><rect x="16" y="12" width="4" height="4" fill="#993F1E"/>
+      <rect x="4" y="16" width="4" height="4" fill="#993F1E"/><rect x="8" y="16" width="4" height="4" fill="#993F1E"/><rect x="12" y="16" width="4" height="4" fill="#662A14"/>
+      <rect x="8" y="20" width="4" height="4" fill="#662A14"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#FF6B35" opacity="0.7" text-anchor="middle">deploy</text>
+    </g></g>
+    <!-- Kernel: "docker" at (159,189) -->
+    <g class="orbit3"><g transform="translate(159,171)">
+      <rect x="8" y="0" width="4" height="4" fill="#D4A843"/>
+      <rect x="4" y="4" width="4" height="4" fill="#F5E6C8"/><rect x="8" y="4" width="4" height="4" fill="#D4A843"/><rect x="12" y="4" width="4" height="4" fill="#C4941A"/>
+      <rect x="0" y="8" width="4" height="4" fill="#F5E6C8"/><rect x="4" y="8" width="4" height="4" fill="#D4A843"/><rect x="8" y="8" width="4" height="4" fill="#D4A843"/><rect x="12" y="8" width="4" height="4" fill="#C4941A"/><rect x="16" y="8" width="4" height="4" fill="#8B6914"/>
+      <rect x="0" y="12" width="4" height="4" fill="#D4A843"/><rect x="4" y="12" width="4" height="4" fill="#C4941A"/><rect x="8" y="12" width="4" height="4" fill="#C4941A"/><rect x="12" y="12" width="4" height="4" fill="#8B6914"/><rect x="16" y="12" width="4" height="4" fill="#8B6914"/>
+      <rect x="4" y="16" width="4" height="4" fill="#8B6914"/><rect x="8" y="16" width="4" height="4" fill="#8B6914"/><rect x="12" y="16" width="4" height="4" fill="#3D2E0A"/>
+      <rect x="8" y="20" width="4" height="4" fill="#3D2E0A"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#D4A843" opacity="0.7" text-anchor="middle">docker</text>
+    </g></g>
+    <!-- Kernel: "lint" at (110,210) -->
+    <g class="orbit4"><g transform="translate(110,192)">
+      <rect x="8" y="0" width="4" height="4" fill="#FFF8E7"/>
+      <rect x="4" y="4" width="4" height="4" fill="#FFF8E7"/><rect x="8" y="4" width="4" height="4" fill="#FFF8E7"/><rect x="12" y="4" width="4" height="4" fill="#F5E6C8"/>
+      <rect x="0" y="8" width="4" height="4" fill="#FFF8E7"/><rect x="4" y="8" width="4" height="4" fill="#FFF8E7"/><rect x="8" y="8" width="4" height="4" fill="#FFF8E7"/><rect x="12" y="8" width="4" height="4" fill="#F5E6C8"/><rect x="16" y="8" width="4" height="4" fill="#C4941A"/>
+      <rect x="0" y="12" width="4" height="4" fill="#FFF8E7"/><rect x="4" y="12" width="4" height="4" fill="#F5E6C8"/><rect x="8" y="12" width="4" height="4" fill="#F5E6C8"/><rect x="12" y="12" width="4" height="4" fill="#C4941A"/><rect x="16" y="12" width="4" height="4" fill="#C4941A"/>
+      <rect x="4" y="16" width="4" height="4" fill="#C4941A"/><rect x="8" y="16" width="4" height="4" fill="#C4941A"/><rect x="12" y="16" width="4" height="4" fill="#5A4510"/>
+      <rect x="8" y="20" width="4" height="4" fill="#5A4510"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#F5E6C8" opacity="0.7" text-anchor="middle">lint</text>
+    </g></g>
+    <!-- Kernel: "research" at (60,189) -->
+    <g class="orbit5"><g transform="translate(60,171)">
+      <rect x="8" y="0" width="4" height="4" fill="#44AA99"/>
+      <rect x="4" y="4" width="4" height="4" fill="#66CCBB"/><rect x="8" y="4" width="4" height="4" fill="#44AA99"/><rect x="12" y="4" width="4" height="4" fill="#338877"/>
+      <rect x="0" y="8" width="4" height="4" fill="#66CCBB"/><rect x="4" y="8" width="4" height="4" fill="#44AA99"/><rect x="8" y="8" width="4" height="4" fill="#44AA99"/><rect x="12" y="8" width="4" height="4" fill="#338877"/><rect x="16" y="8" width="4" height="4" fill="#226655"/>
+      <rect x="0" y="12" width="4" height="4" fill="#44AA99"/><rect x="4" y="12" width="4" height="4" fill="#338877"/><rect x="8" y="12" width="4" height="4" fill="#338877"/><rect x="12" y="12" width="4" height="4" fill="#226655"/><rect x="16" y="12" width="4" height="4" fill="#226655"/>
+      <rect x="4" y="16" width="4" height="4" fill="#226655"/><rect x="8" y="16" width="4" height="4" fill="#226655"/><rect x="12" y="16" width="4" height="4" fill="#114433"/>
+      <rect x="8" y="20" width="4" height="4" fill="#114433"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#44AA99" opacity="0.7" text-anchor="middle">research</text>
+    </g></g>
+    <!-- Kernel: "design" at (40,140) -->
+    <g class="orbit6"><g transform="translate(40,122)">
+      <rect x="8" y="0" width="4" height="4" fill="#9B72CF"/>
+      <rect x="4" y="4" width="4" height="4" fill="#B894E0"/><rect x="8" y="4" width="4" height="4" fill="#9B72CF"/><rect x="12" y="4" width="4" height="4" fill="#7B52AF"/>
+      <rect x="0" y="8" width="4" height="4" fill="#B894E0"/><rect x="4" y="8" width="4" height="4" fill="#9B72CF"/><rect x="8" y="8" width="4" height="4" fill="#9B72CF"/><rect x="12" y="8" width="4" height="4" fill="#7B52AF"/><rect x="16" y="8" width="4" height="4" fill="#5C3D8F"/>
+      <rect x="0" y="12" width="4" height="4" fill="#9B72CF"/><rect x="4" y="12" width="4" height="4" fill="#7B52AF"/><rect x="8" y="12" width="4" height="4" fill="#7B52AF"/><rect x="12" y="12" width="4" height="4" fill="#5C3D8F"/><rect x="16" y="12" width="4" height="4" fill="#5C3D8F"/>
+      <rect x="4" y="16" width="4" height="4" fill="#5C3D8F"/><rect x="8" y="16" width="4" height="4" fill="#5C3D8F"/><rect x="12" y="16" width="4" height="4" fill="#3D2660"/>
+      <rect x="8" y="20" width="4" height="4" fill="#3D2660"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#9B72CF" opacity="0.7" text-anchor="middle">design</text>
+    </g></g>
+    <!-- Kernel: "git" at (60,90) -->
+    <g class="orbit7"><g transform="translate(60,72)">
+      <rect x="8" y="0" width="4" height="4" fill="#7CB342"/>
+      <rect x="4" y="4" width="4" height="4" fill="#9CCC65"/><rect x="8" y="4" width="4" height="4" fill="#7CB342"/><rect x="12" y="4" width="4" height="4" fill="#558B2F"/>
+      <rect x="0" y="8" width="4" height="4" fill="#9CCC65"/><rect x="4" y="8" width="4" height="4" fill="#7CB342"/><rect x="8" y="8" width="4" height="4" fill="#7CB342"/><rect x="12" y="8" width="4" height="4" fill="#558B2F"/><rect x="16" y="8" width="4" height="4" fill="#33691E"/>
+      <rect x="0" y="12" width="4" height="4" fill="#7CB342"/><rect x="4" y="12" width="4" height="4" fill="#558B2F"/><rect x="8" y="12" width="4" height="4" fill="#558B2F"/><rect x="12" y="12" width="4" height="4" fill="#33691E"/><rect x="16" y="12" width="4" height="4" fill="#33691E"/>
+      <rect x="4" y="16" width="4" height="4" fill="#33691E"/><rect x="8" y="16" width="4" height="4" fill="#33691E"/><rect x="12" y="16" width="4" height="4" fill="#1B5E20"/>
+      <rect x="8" y="20" width="4" height="4" fill="#1B5E20"/>
+      <text x="10" y="34" font-family="monospace" font-size="8" fill="#7CB342" opacity="0.7" text-anchor="middle">git</text>
+    </g></g>
+    </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 2: FLOW ARROWS (x:190-220)       -->
+  <!-- ══════════════════════════════════════════ -->
+  <g class="arrow-pulse">
+    <!-- Left: small pixel chevrons -->
+    <rect x="218" y="134" width="3" height="3" fill="#D4A843"/>
+    <rect x="221" y="137" width="3" height="3" fill="#D4A843"/>
+    <rect x="224" y="140" width="3" height="3" fill="#D4A843"/>
+    <rect x="221" y="143" width="3" height="3" fill="#D4A843"/>
+    <rect x="218" y="146" width="3" height="3" fill="#D4A843"/>
+    <rect x="230" y="134" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="233" y="137" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="236" y="140" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="233" y="143" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="230" y="146" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+  </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 3: TITLE BLOCK (x:240-630)       -->
+  <!-- ══════════════════════════════════════════ -->
+
+  <!-- Pixel popcorn emoji (mini 6x6 pixel kernel) -->
+  <g transform="translate(298,86)">
+    <rect x="4" y="0" width="4" height="4" fill="#FFF8E7"/>
+    <rect x="0" y="4" width="4" height="4" fill="#FFF8E7"/><rect x="4" y="4" width="4" height="4" fill="#F5E6C8"/><rect x="8" y="4" width="4" height="4" fill="#D4A843"/>
+    <rect x="0" y="8" width="4" height="4" fill="#F5E6C8"/><rect x="4" y="8" width="4" height="4" fill="#D4A843"/><rect x="8" y="8" width="4" height="4" fill="#C4941A"/>
+    <rect x="4" y="12" width="4" height="4" fill="#8B6914"/>
+    <!-- bucket pixel -->
+    <rect x="0" y="16" width="12" height="4" fill="#E63946"/>
+    <rect x="0" y="20" width="12" height="4" fill="#B22234"/>
+  </g>
+
+  <!-- Title -->
+  <text x="485" y="108" font-family="monospace" font-weight="bold" font-size="34" letter-spacing="2" text-anchor="middle"><tspan fill="#F5E6C8">POPCORN</tspan> <tspan fill="#E63946">HARNESS</tspan></text>
+
+  <!-- Subtitle — LARGE & READABLE -->
+  <text x="485" y="138" font-family="monospace" font-size="14" fill="#D4A843" text-anchor="middle">Find and Assemble Your Skills/Agents/Tools into Action!</text>
+
+  <!-- Divider -->
+  <rect x="285" y="152" width="400" height="1" fill="#D4A843" opacity="0.2"/>
+
+  <!-- Tags -->
+  <!-- Tags (centered at x=535) -->
+  <g transform="translate(0,164)">
+    <!-- Claude Code tag -->
+    <rect x="356" y="0" width="95" height="20" fill="#d7704d" opacity="0.1"/>
+    <rect x="356" y="0" width="95" height="20" fill="none" stroke="#d7704d" stroke-width="0.5" opacity="0.3"/>
+    <text x="403" y="14" font-family="monospace" font-size="10" fill="#d7704d" text-anchor="middle">CLAUDE CODE</text>
+
+    <!-- Hermes tag -->
+    <rect x="461" y="0" width="65" height="20" fill="#D4A843" opacity="0.1"/>
+    <rect x="461" y="0" width="65" height="20" fill="none" stroke="#D4A843" stroke-width="0.5" opacity="0.3"/>
+    <text x="493" y="14" font-family="monospace" font-size="10" fill="#D4A843" text-anchor="middle">HERMES</text>
+
+    <!-- OpenClaw tag -->
+    <rect x="536" y="0" width="78" height="20" fill="#44AA99" opacity="0.1"/>
+    <rect x="536" y="0" width="78" height="20" fill="none" stroke="#44AA99" stroke-width="0.5" opacity="0.3"/>
+    <text x="575" y="14" font-family="monospace" font-size="10" fill="#44AA99" text-anchor="middle">OPENCLAW</text>
+  </g>
+
+
+  <!-- Right arrows: title → harness -->
+  <g class="arrow-pulse">
+    <!-- Right: small pixel chevrons -->
+    <rect x="738" y="134" width="3" height="3" fill="#D4A843"/>
+    <rect x="741" y="137" width="3" height="3" fill="#D4A843"/>
+    <rect x="744" y="140" width="3" height="3" fill="#D4A843"/>
+    <rect x="741" y="143" width="3" height="3" fill="#D4A843"/>
+    <rect x="738" y="146" width="3" height="3" fill="#D4A843"/>
+    <rect x="750" y="134" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="753" y="137" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="756" y="140" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="753" y="143" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+    <rect x="750" y="146" width="3" height="3" fill="#D4A843" opacity="0.5"/>
+  </g>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 4: ASSEMBLED HARNESS (x:650-810) -->
+  <!-- ══════════════════════════════════════════ -->
+
+  <!-- Harness container -->
+  <rect x="770" y="42" width="152" height="196" fill="#0f0f1a" stroke="#D4A843" stroke-width="0.5" opacity="0.4"/>
+  <rect x="770" y="42" width="152" height="196" fill="#0f0f1a"/>
+  <rect x="770" y="42" width="152" height="196" fill="none" stroke="#D4A843" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Harness header -->
+  <text x="786" y="60" font-family="monospace" font-size="8" fill="#D4A843" opacity="0.5" letter-spacing="2">HARNESS</text>
+  <rect x="780" y="66" width="132" height="1" fill="#D4A843" opacity="0.15"/>
+
+  <!-- Row 1: security-review -->
+  <g transform="translate(780,76)">
+    <rect x="0" y="0" width="8" height="8" fill="#E63946"/>
+    <text x="14" y="8" font-family="monospace" font-size="9" fill="#F5E6C8" opacity="0.9">security-review</text>
+    <g class="ck1"><text x="122" y="8" font-family="monospace" font-size="9" fill="#44AA99">✓</text></g>
+  </g>
+
+  <!-- Row 2: e2e-testing -->
+  <g transform="translate(780,100)">
+    <rect x="0" y="0" width="8" height="8" fill="#F5E6C8"/>
+    <text x="14" y="8" font-family="monospace" font-size="9" fill="#F5E6C8" opacity="0.9">e2e-testing</text>
+    <g class="ck2"><text x="122" y="8" font-family="monospace" font-size="9" fill="#44AA99">✓</text></g>
+  </g>
+
+  <!-- Row 3: deploy-patterns -->
+  <g transform="translate(780,124)">
+    <rect x="0" y="0" width="8" height="8" fill="#FF6B35"/>
+    <text x="14" y="8" font-family="monospace" font-size="9" fill="#F5E6C8" opacity="0.9">deploy-patterns</text>
+    <g class="ck3"><text x="122" y="8" font-family="monospace" font-size="9" fill="#44AA99">✓</text></g>
+  </g>
+
+  <!-- Phase divider -->
+  <rect x="780" y="142" width="132" height="1" fill="#D4A843" opacity="0.1"/>
+  <text x="790" y="155" font-family="monospace" font-size="7" fill="#D4A843" opacity="0.35">▼ phase 2</text>
+
+  <!-- Row 4: docker-patterns -->
+  <g transform="translate(780,164)">
+    <rect x="0" y="0" width="8" height="8" fill="#D4A843"/>
+    <text x="14" y="8" font-family="monospace" font-size="9" fill="#F5E6C8" opacity="0.9">docker-patterns</text>
+    <g class="ck4"><text x="122" y="8" font-family="monospace" font-size="9" fill="#44AA99">✓</text></g>
+  </g>
+
+  <!-- Row 5: lint-standards -->
+  <g transform="translate(780,188)">
+    <rect x="0" y="0" width="8" height="8" fill="#FFF8E7"/>
+    <text x="14" y="8" font-family="monospace" font-size="9" fill="#F5E6C8" opacity="0.9">lint-standards</text>
+    <g class="ck5"><text x="122" y="8" font-family="monospace" font-size="9" fill="#44AA99">✓</text></g>
+  </g>
+
+  <!-- Harness ready status -->
+  <rect x="780" y="210" width="132" height="18" fill="#44AA99" opacity="0.08"/>
+  <rect x="780" y="210" width="132" height="18" fill="none" stroke="#44AA99" stroke-width="0.5" opacity="0.2"/>
+  <text x="792" y="223" font-family="monospace" font-size="9" fill="#44AA99">⚡ harness ready</text>
+
+  <!-- ══ Subtle border ══ -->
+  <rect width="960" height="280" rx="8" fill="none" stroke="#D4A843" stroke-width="0.5" opacity="0.1"/>
+</svg>

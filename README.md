@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="popcorn-harness banner" width="100%">
+</p>
+
 # popcorn-harness
 
 > Instant on-the-fly harness assembler for Claude Code, Hermes, and OpenClaw.
