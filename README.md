@@ -7,7 +7,7 @@
 **Popcorn Harness** is a cross-platform plugin that discovers your available skills, agents, and commands on the fly, then pops them together into an optimized execution harness. No manual selection. No guessing. Just describe your task and let it assemble the right capabilities for you.
 
 ```
-User: popcorn — prep this Next.js app for production
+User: /popcorn-harness Prep this Next.js app for production
 
 Platform detected: Claude Code (project)
 Tier: 3 — Full Pop
