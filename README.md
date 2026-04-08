@@ -4,7 +4,7 @@
 
 <p align="center"><em>Instant on-the-fly harness assembler for Claude Code, Hermes, and OpenClaw.</em></p>
 
-Given a task, `popcorn-harness` discovers your available skills, agents, and commands — then pops them together into an optimized execution harness. No manual tool selection. No guessing. Works across platforms.
+**Popcorn Harness** is a cross-platform plugin that discovers your available skills, agents, and commands on the fly, then pops them together into an optimized execution harness. No manual selection. No guessing. Just describe your task and let it assemble the right capabilities for you.
 
 ```
 User: popcorn — prep this Next.js app for production
