@@ -8,7 +8,7 @@
 
 ```
 User: /popcorn-harness Prep this Next.js app for production
-🍿 Popping harness!
+  🍿 Popping harness!
 
 Platform detected: Claude Code (project)
 Tier: 3 — Full Pop
