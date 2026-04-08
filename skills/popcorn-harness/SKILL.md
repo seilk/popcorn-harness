@@ -55,7 +55,7 @@ If the script is unavailable (Hermes/OpenClaw context or no bash), use the fallb
 |--------|----------|
 | `claude` CLI in PATH + `.claude/` dir exists | Claude Code (project) |
 | `claude` CLI in PATH, no `.claude/` dir | Claude Code (user) |
-| `available_skills` in system prompt, no `claude` CLI | Hermes / Fox |
+| `available_skills` in system prompt, no `claude` CLI | Hermes |
 | Above + `OPENCLAW` env var set | OpenClaw |
 
 **Ambiguous detection → default to Hermes (context-based). Never halt.**
@@ -77,7 +77,7 @@ Read the JSON output. The `errors` field lists what failed — surface it if cri
 
 **Zero results protocol:** report "No capabilities found via [sources]. Check installation." and halt. Do not proceed with an empty harness.
 
-### Hermes / Fox / OpenClaw
+### Hermes / OpenClaw
 
 Capabilities are already present in `available_skills` (injected in system prompt). Extract:
 1. All skill names + one-line descriptions from the injected block
@@ -170,7 +170,7 @@ For full graph patterns and parallel dispatch mechanics, load [references/assemb
 - **Parallel:** spawn all Phase 1 agents simultaneously — do NOT await one before starting another
 - Full parallel dispatch syntax: see [references/assembly-patterns.md](references/assembly-patterns.md) § Parallel Dispatch
 
-### Hermes / Fox / OpenClaw
+### Hermes / OpenClaw
 
 - **Skills:** `skill_view(name="<skill-name>")` — load then follow
 - **Parallel:** `delegate_task(tasks=[...])` — pass ALL context per subagent (no shared memory)
