@@ -48,39 +48,33 @@ Proceed? [y/n/adjust]
 
 ## Installation
 
-### Claude Code — via Plugin System (recommended)
+### Claude Code — recommended
 
-Install directly from GitHub using the Claude Code plugin command:
+Add this repo as a marketplace, then install from it:
 
 ```
-/plugin install seilk/popcorn-harness
+/plugin marketplace add seilk/popcorn-harness
+/plugin install popcorn-harness@popcorn-harness
 ```
 
-Or use the full URL form:
+`seilk/popcorn-harness` points to the GitHub repo, which contains `.claude-plugin/marketplace.json`.
+The second `popcorn-harness` is the marketplace `name` field defined in that file.
+
+After installation, run `/reload-plugins` if commands don't appear immediately.
+
+### Claude Code — direct install (no marketplace step)
 
 ```
 /plugin install https://github.com/seilk/popcorn-harness
 ```
 
-After installation, run `/reload-plugins` if the commands don't appear immediately.
-Skills are namespaced: use `/popcorn-harness:popcorn` or just trigger via the `popcorn` keyword.
-
-### Claude Code — via Official Marketplace
-
-popcorn-harness is listed in the Claude plugin directory. You can browse and install it from:
-
-- **Claude.ai:** Settings → Extensions → browse "popcorn-harness"
-- **Claude Code CLI:** `/plugin marketplace list` then `/plugin install popcorn-harness@claude-plugins-official`
-
 ### Claude Code — local development / testing
-
-To test a local copy without installing:
 
 ```bash
 claude --plugin-dir ./popcorn-harness
 ```
 
-Use `/reload-plugins` after making changes. When the local `--plugin-dir` name matches an installed plugin, the local copy takes precedence for that session.
+Use `/reload-plugins` after making changes. The local copy takes precedence over any installed version.
 
 ### Claude Code — manual install (fallback)
 
@@ -277,13 +271,13 @@ Anthropic runs automated safety and quality checks on every submission. The revi
 
 ### Step 4 — After approval
 
-Once listed, users can find and install via the official marketplace (`claude-plugins-official` is pre-configured in every Claude Code install):
+`claude-plugins-official` is pre-configured in every Claude Code install. Once the plugin is approved and listed, users can install it without any prior marketplace setup:
 
 ```
 /plugin install popcorn-harness@claude-plugins-official
 ```
 
-Or browse interactively in Claude Code:
+Or browse interactively:
 
 ```
 /plugin   →   Discover tab
@@ -291,8 +285,8 @@ Or browse interactively in Claude Code:
 
 The plugin also appears at claude.com/plugins and in the Extensions browser at Claude.ai → Settings → Extensions.
 
-The official plugin registry is at: https://github.com/anthropics/claude-plugins-official
-External (community) plugins land in the `external_plugins/` directory of that repo.
+The official plugin registry (GitHub): https://github.com/anthropics/claude-plugins-official
+Community submissions land in the `external_plugins/` directory of that repo.
 
 ### Step 5 — Updates and re-submission
 
