@@ -226,20 +226,80 @@ popcorn — get this app production-ready
 
 ---
 
-## Submitting to the Official Plugin Directory
+## Registering with the Official Plugin Directory
 
-To register popcorn-harness (or a fork) in the official Claude plugin directory so all Claude Code users can discover it:
+The Claude plugin directory is surfaced as the `claude-plugins-official` marketplace inside Claude Code and is automatically available to all users. Listing there means anyone can install with a single `/plugin install` command.
 
-1. **Prepare the plugin** — ensure `.claude-plugin/plugin.json` is complete and the repo is public on GitHub.
-2. **Submit via in-app form:**
-   - Claude.ai: https://claude.ai/settings/plugins/submit
-   - Console: https://platform.claude.com/plugins/submit
-3. **Provide GitHub URL** — `https://github.com/seilk/popcorn-harness` (or zip upload).
-4. **Wait for review** — Anthropic runs automated safety/quality checks. Once approved, the plugin appears in `claude-plugins-official` marketplace.
+### Step 1 — Pre-submission checklist
 
-Re-submit after every meaningful update — each version is scanned before being listed.
+Before submitting, verify the following locally:
 
-For "Anthropic Verified" badge status, plugins undergo additional manual review. There is no separate application; Anthropic selects plugins for verification internally.
+```bash
+# 1. plugin.json exists and parses cleanly
+cat .claude-plugin/plugin.json | python3 -m json.tool
+
+# 2. All declared directories actually exist (skills/, agents/, commands/ etc.)
+ls -1
+
+# 3. Test the plugin loads without errors
+claude --plugin-dir . --print "/help" 2>&1 | head -20
+```
+
+Mandatory fields in `.claude-plugin/plugin.json`:
+
+| Field | Requirement |
+|-------|-------------|
+| `name` | kebab-case, unique, becomes the skill namespace |
+| `description` | clear one-liner shown in marketplace listings |
+| `version` | semver (e.g. `1.0.0`) |
+| `license` | declared (e.g. `MIT`) |
+
+Optional but strongly recommended for discoverability: `keywords`, `tags`, `homepage`, `repository`.
+
+### Step 2 — Submit to the directory
+
+Use one of the official in-app submission forms:
+
+- **Claude.ai:** https://claude.ai/settings/plugins/submit
+- **Console:** https://platform.claude.com/plugins/submit
+
+You can submit either:
+- A **GitHub URL** pointing to the repo root (e.g. `https://github.com/seilk/popcorn-harness`)
+- A **zip file** of the plugin directory (preserving folder structure)
+
+### Step 3 — Review process
+
+Anthropic runs automated safety and quality checks on every submission. The review typically completes within a few days. During that time, users can still install directly via GitHub URL — marketplace listing adds discoverability, not functionality:
+
+```
+/plugin install https://github.com/seilk/popcorn-harness
+```
+
+### Step 4 — After approval
+
+Once listed, users can find and install via the official marketplace:
+
+```
+/plugin install popcorn-harness@claude-plugins-official
+```
+
+The plugin also appears in the Extensions browser at Claude.ai → Settings → Extensions.
+
+### Step 5 — Updates and re-submission
+
+Every update requires re-submission — each version is scanned independently before going live.
+
+Recommended workflow for releases:
+1. Bump `version` in `.claude-plugin/plugin.json` (semver)
+2. Commit and push to GitHub
+3. Re-submit the same GitHub URL via the form above
+
+### Anthropic Verified badge
+
+Plugins with the Verified badge have passed additional manual review. There is no separate application process — Anthropic selects plugins internally. Improving your chances:
+- Bundle related capabilities (skills + agents + commands) into a cohesive workflow
+- Keep MCP connectors to well-known, auditable sources
+- Maintain a clear README with usage examples and a troubleshooting section
 
 ---
 
