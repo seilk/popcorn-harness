@@ -277,13 +277,22 @@ Anthropic runs automated safety and quality checks on every submission. The revi
 
 ### Step 4 — After approval
 
-Once listed, users can find and install via the official marketplace:
+Once listed, users can find and install via the official marketplace (`claude-plugins-official` is pre-configured in every Claude Code install):
 
 ```
 /plugin install popcorn-harness@claude-plugins-official
 ```
 
-The plugin also appears in the Extensions browser at Claude.ai → Settings → Extensions.
+Or browse interactively in Claude Code:
+
+```
+/plugin   →   Discover tab
+```
+
+The plugin also appears at claude.com/plugins and in the Extensions browser at Claude.ai → Settings → Extensions.
+
+The official plugin registry is at: https://github.com/anthropics/claude-plugins-official
+External (community) plugins land in the `external_plugins/` directory of that repo.
 
 ### Step 5 — Updates and re-submission
 
