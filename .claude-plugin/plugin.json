@@ -1,6 +1,6 @@
 {
   "name": "popcorn-harness",
-  "description": "Instant on-the-fly harness assembler. Discovers available skills, agents, and commands across Claude Code, Hermes, and OpenClaw \u2014 pops them together to execute any task.",
+  "description": "Instant on-the-fly harness assembler. Discovers available skills, agents, and commands across Claude Code, Hermes, and OpenClaw — pops them together to execute any task.",
   "version": "0.3.0",
   "author": {
     "name": "seilk",
@@ -16,6 +16,17 @@
     "orchestrator",
     "cross-platform",
     "hermes",
-    "openclaw"
+    "openclaw",
+    "automation",
+    "multi-agent",
+    "capability-discovery",
+    "task-delegation",
+    "parallel-execution"
+  ],
+  "tags": [
+    "productivity",
+    "orchestration",
+    "multi-agent",
+    "automation"
   ]
 }

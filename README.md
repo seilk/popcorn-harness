@@ -48,17 +48,45 @@ Proceed? [y/n/adjust]
 
 ## Installation
 
-### Claude Code (plugin)
+### Claude Code — via Plugin System (recommended)
 
-```bash
-# Clone the repo
-git clone https://github.com/seilk/popcorn-harness ~/.claude/plugins/popcorn-harness
+Install directly from GitHub using the Claude Code plugin command:
 
-# Or copy manually
-cp -r popcorn-harness ~/.claude/plugins/
+```
+/plugin install seilk/popcorn-harness
 ```
 
-Then restart Claude Code. The `/popcorn` command and `popcorn-orchestrator` agent will be available automatically.
+Or use the full URL form:
+
+```
+/plugin install https://github.com/seilk/popcorn-harness
+```
+
+After installation, run `/reload-plugins` if the commands don't appear immediately.
+Skills are namespaced: use `/popcorn-harness:popcorn` or just trigger via the `popcorn` keyword.
+
+### Claude Code — via Official Marketplace
+
+popcorn-harness is listed in the Claude plugin directory. You can browse and install it from:
+
+- **Claude.ai:** Settings → Extensions → browse "popcorn-harness"
+- **Claude Code CLI:** `/plugin marketplace list` then `/plugin install popcorn-harness@claude-plugins-official`
+
+### Claude Code — local development / testing
+
+To test a local copy without installing:
+
+```bash
+claude --plugin-dir ./popcorn-harness
+```
+
+Use `/reload-plugins` after making changes. When the local `--plugin-dir` name matches an installed plugin, the local copy takes precedence for that session.
+
+### Claude Code — manual install (fallback)
+
+```bash
+git clone https://github.com/seilk/popcorn-harness ~/.claude/plugins/popcorn-harness
+```
 
 ### Hermes
 
@@ -77,6 +105,29 @@ Add the skills directory to `external_dirs` in your Hermes config:
 skills:
   external_dirs:
     - /path/to/popcorn-harness/skills
+```
+
+### Team / Custom Marketplace
+
+If you host your own Claude Code marketplace, add popcorn-harness as a source:
+
+```json
+{
+  "name": "my-marketplace",
+  "plugins": [
+    {
+      "name": "popcorn-harness",
+      "source": "https://github.com/seilk/popcorn-harness"
+    }
+  ]
+}
+```
+
+Or point teammates directly at this repo as a marketplace:
+
+```
+/plugin marketplace add seilk/popcorn-harness
+/plugin install popcorn-harness@popcorn-harness
 ```
 
 ---
@@ -172,6 +223,23 @@ popcorn — get this app production-ready
 **"Harness produced poor results"**
 - Try Tier 3: describe the task more broadly to trigger full discovery
 - Manually specify capabilities: "popcorn — use security-review and e2e-testing to..."
+
+---
+
+## Submitting to the Official Plugin Directory
+
+To register popcorn-harness (or a fork) in the official Claude plugin directory so all Claude Code users can discover it:
+
+1. **Prepare the plugin** — ensure `.claude-plugin/plugin.json` is complete and the repo is public on GitHub.
+2. **Submit via in-app form:**
+   - Claude.ai: https://claude.ai/settings/plugins/submit
+   - Console: https://platform.claude.com/plugins/submit
+3. **Provide GitHub URL** — `https://github.com/seilk/popcorn-harness` (or zip upload).
+4. **Wait for review** — Anthropic runs automated safety/quality checks. Once approved, the plugin appears in `claude-plugins-official` marketplace.
+
+Re-submit after every meaningful update — each version is scanned before being listed.
+
+For "Anthropic Verified" badge status, plugins undergo additional manual review. There is no separate application; Anthropic selects plugins for verification internally.
 
 ---
 

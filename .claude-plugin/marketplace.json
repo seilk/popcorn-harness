@@ -1,0 +1,18 @@
+{
+  "name": "popcorn-harness",
+  "description": "Popcorn Harness — cross-platform skill orchestrator plugin for Claude Code, Hermes, and OpenClaw.",
+  "owner": {
+    "name": "seilk",
+    "url": "https://github.com/seilk"
+  },
+  "plugins": [
+    {
+      "name": "popcorn-harness",
+      "version": "0.3.0",
+      "description": "Instant on-the-fly harness assembler. Discovers skills, agents, and commands — pops them together to execute any multi-domain task.",
+      "source": ".",
+      "category": "productivity",
+      "tags": ["orchestration", "multi-agent", "automation", "cross-platform"]
+    }
+  ]
+}
