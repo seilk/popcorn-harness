@@ -9,9 +9,9 @@ Reference for SKILL.md Step 3. Load when building execution graphs.
 All capabilities are independent. Run simultaneously.
 
 ```
-[capability-A] ─┐
-[capability-B] ─┼──► [Synthesis]
-[capability-C] ─┘
+[capability-A] --+
+[capability-B] --+--> [Synthesis]
+[capability-C] --+
 ```
 
 **Use when:** Each capability reads the same inputs (codebase, vault, repo) independently.
@@ -22,47 +22,48 @@ All capabilities are independent. Run simultaneously.
 Each step feeds its output to the next.
 
 ```
-[capability-A] ──► [capability-B] ──► [capability-C]
+[capability-A] --> [capability-B] --> [capability-C]
 ```
 
-**Use when:** B requires A's output as its primary input.
-**Examples:** research-ops → deployment-patterns (research informs deployment decisions)
+**Use when:** B requires A's output as its primary input. Dependency signals include B's description mentioning "prior analysis", "audit results", or "findings", or the task using "then", "after", "based on results of".
+**Examples:** research-ops -> deployment-patterns (deployment-patterns description says "requires prior analysis of target environment")
 
 ### Pattern C: Gather-then-Act (Most Common)
 
 Parallel information gathering, then sequential action.
 
 ```
-[capability-A] ─┐
-[capability-B] ─┼──► [sync point] ──► [capability-D] ──► [capability-E]
-[capability-C] ─┘
+[capability-A] --+
+[capability-B] --+--> [sync point] --> [capability-D] --> [capability-E]
+[capability-C] --+
 ```
 
 **Use when:** Multiple audit/analysis steps feed into a single action step.
-**Examples:** security + tests + seo → deployment → docker
+**Examples:** security + tests + seo -> deployment -> docker
 
 ### Pattern D: Fork-Join
 
 One capability fans out to multiple independent follow-ups.
 
 ```
-                    ┌──► [capability-B]
-[capability-A] ─────┤
-                    └──► [capability-C]
+                    +--> [capability-B]
+[capability-A] ----+
+                    +--> [capability-C]
 ```
 
 **Use when:** A produces distinct outputs that each need specialized processing.
-**Examples:** research-ops → (market-research + obsidian-finance-vault)
+**Examples:** research-ops -> (market-research + obsidian-finance-vault)
 
 ## Dependency Detection Rules
 
-Two capabilities are **parallel-safe** when ALL of:
+Two capabilities are **parallel-safe** when BOTH of:
 - Neither capability modifies shared files during execution
 - Neither capability's output is listed as input in the other's description
-- They operate on different domains (security vs. SEO, testing vs. deployment)
+
+**Tip:** Different domains (security vs. SEO, testing vs. deployment) often signal parallel safety, but the decisive conditions are the two rules above. Two read-only capabilities in the same domain (e.g., two security scanners) are parallel-safe.
 
 Two capabilities are **sequentially dependent** when ANY of:
-- Capability B's description mentions needing "prior analysis", "audit results", or "findings"
+- Capability B's description mentions needing "prior analysis", "audit results", "findings", or "informs"
 - Capability A writes files that B reads
 - The task description uses "then", "after", "based on results of"
 
@@ -85,7 +86,9 @@ Never put an `act` capability in parallel with a `gather` if they share the same
 ### On Claude Code (Agent tool)
 
 ```
-Spawn simultaneously — do NOT await one before starting another:
+Spawn simultaneously — do NOT await one before starting another.
+Use only the standard Agent tool for parallel spawning — avoid any
+orchestration primitives designed for debate or critique loops.
 
   Agent call 1:
     subagent_type: "general-purpose"
@@ -96,7 +99,6 @@ Spawn simultaneously — do NOT await one before starting another:
     prompt: "[full content of agent-B.md]\n\nTask: [subtask-B description]\n\nContext: [relevant repo/project context]"
 
 Collect BOTH responses before proceeding to next phase.
-Do NOT use TeamCreate — that is for agents that must debate each other.
 ```
 
 ### On Hermes / OpenClaw (delegate_task)
@@ -125,6 +127,6 @@ When capability count exceeds 5, prune by this priority:
 1. Remove capabilities that overlap in domain (keep the more specific one)
 2. Remove capabilities whose description least matches the task's primary goal
 3. Remove `verify` role capabilities (can be done manually after)
-4. If still > 5: split into two sequential harness runs — present both plans to user
+4. If still > 5: split into two harness runs. Present Plan A (capabilities 1-5) and Plan B (remaining). The user runs Plan B after Plan A completes, using Plan A's output as context. Do not auto-chain.
 
 Never silently drop a capability. Always report what was pruned and why.

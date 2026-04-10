@@ -1,2 +1,18 @@
+# Runtime directories
 .openchrome/
 .ralph/
+
+# Claude Code local settings
+.claude/
+
+# OS artifacts
+.DS_Store
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# Vercel (if CLI is active in session)
+.vercel/

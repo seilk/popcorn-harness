@@ -19,17 +19,17 @@ Given the original task and the harness output, answer:
    - List any task aspect that was NOT covered
    - Rate: Complete / Partial / Missing
 
-2. **Accuracy** — Were the capability outputs factually coherent?
+2. **Accuracy** — Were the capability outputs internally consistent?
    - Flag any contradictions between capabilities
-   - Flag any outputs that seem hallucinated or unsupported
+   - Flag any outputs that make specific claims (file paths, line numbers, CVE IDs, metric values) without visible supporting evidence — note these as "unverifiable" rather than assuming hallucination
 
 3. **Actionability** — Are the Action Items in the Summary concrete enough to execute?
-   - Vague: "improve security" → flag it
-   - Concrete: "add Content-Security-Policy header to next.config.js" → pass
+   - Vague: "improve security" -> flag it
+   - Concrete: "add Content-Security-Policy header to next.config.js" -> pass
 
-4. **Gaps** — What capability was NOT used but should have been?
-   - Name the specific skill or agent
-   - Explain why it would have improved the output
+4. **Gaps** — What TYPE of capability was missing that would have improved the output?
+   - Describe the missing capability type (e.g., "a dependency vulnerability scanner", "a load-testing tool")
+   - Name a specific skill only if it is referenced in the harness output — otherwise describe what's missing conceptually
 
 5. **Overall verdict:**
    - PASS: output adequately addresses the task, action items are clear
@@ -51,7 +51,7 @@ Accuracy: [issues found or "none"]
 
 Actionability: [concrete items] / [vague items that need clarification]
 
-Gaps: [missing capabilities that would have helped]
+Gaps: [missing capability types that would have helped]
 
 Verdict: PASS / REVISE / FAIL
   Reason: [one sentence]
@@ -63,4 +63,4 @@ Verdict: PASS / REVISE / FAIL
 - Be specific. "It was good" is not a review.
 - Do not re-execute any capabilities. Only review the output given.
 - If the task was ambiguous and the harness made a reasonable interpretation, note the interpretation and whether it was correct.
-- Keep the review under 400 words. Brevity is quality here.
+- Keep under 400 words for Tier 1-2 runs; up to 600 words for Tier 3 runs with 4+ capabilities.
