@@ -103,7 +103,7 @@ If you host your own Claude Code marketplace, add popcorn-harness as a source:
   "plugins": [
     {
       "name": "popcorn-harness",
-      "source": { "type": "github", "repo": "seilk/popcorn-harness" }
+      "source": { "source": "url", "url": "https://github.com/seilk/popcorn-harness.git" }
     }
   ]
 }

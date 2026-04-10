@@ -11,8 +11,8 @@
       "version": "0.3.0",
       "description": "Instant on-the-fly harness assembler. Discovers skills, agents, and commands — pops them together to execute any multi-domain task.",
       "source": {
-        "type": "github",
-        "repo": "seilk/popcorn-harness"
+        "source": "url",
+        "url": "https://github.com/seilk/popcorn-harness.git"
       },
       "category": "productivity",
       "tags": ["orchestration", "multi-agent", "automation", "cross-platform"]
