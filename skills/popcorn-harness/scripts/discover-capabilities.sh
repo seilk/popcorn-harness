@@ -149,7 +149,7 @@ if [[ "$PLATFORM" == "claude-code" ]]; then
     cmds_before=${#COMMANDS[@]}
     while IFS= read -r f; do
       add_cmd "$(basename "$f" .md)" "fs:$cmd_dir"
-    done < <(find "$cmd_dir" -name "*.md" -not -name ".*" 2>/dev/null || true)
+    done < <(find "$cmd_dir" -maxdepth 2 -name "*.md" -not -name ".*" 2>/dev/null || true)
     [[ ${#COMMANDS[@]} -gt $cmds_before ]] && SOURCES+=("commands-dir:$(json_escape "$cmd_dir")")
   done
 

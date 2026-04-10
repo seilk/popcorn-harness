@@ -52,7 +52,7 @@ json_escape() {
 # --- Build JSON evidence array ---
 EVIDENCE_JSON="["
 first=1
-for item in "${EVIDENCE[@]}"; do
+for item in "${EVIDENCE[@]+"${EVIDENCE[@]}"}"; do
   [ "$first" -eq 0 ] && EVIDENCE_JSON+=","
   EVIDENCE_JSON+="\"$(json_escape "$item")\""
   first=0

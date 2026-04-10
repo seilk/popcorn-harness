@@ -52,7 +52,8 @@ a full versioned model ID. Run `claude models` to list available models.
 
 If the popcorn-harness SKILL.md cannot be found at any of the paths above,
 halt and respond:
-"popcorn-harness SKILL.md not found. Verify installation with:
+"popcorn-harness SKILL.md not found. Verify installation:
+ls ~/.claude/plugins/popcorn-harness/skills/popcorn-harness/SKILL.md
 ls ~/.claude/skills/popcorn-harness/SKILL.md
 Cannot proceed without it."
 

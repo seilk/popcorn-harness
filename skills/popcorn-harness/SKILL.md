@@ -22,7 +22,8 @@ Given a task, pop the right capabilities together and execute — no manual tool
 **Note on SKILL_DIR:** When scripts are referenced below, `SKILL_DIR` refers to the directory containing this SKILL.md. To determine the correct path, check in order:
 1. `~/.claude/plugins/popcorn-harness/skills/popcorn-harness/` (plugin install)
 2. `~/.claude/skills/popcorn-harness/` (manual install)
-3. `~/.hermes/skills/popcorn-harness/` (Hermes install)
+3. `.claude/skills/popcorn-harness/` (project-level install)
+4. `~/.hermes/skills/popcorn-harness/` (Hermes install)
 
 Use the first path where `SKILL.md` exists. Set it before running any script:
 `SKILL_DIR=<resolved path>`

@@ -2,7 +2,7 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "",
+        "matcher": "*",
         "command": "echo '{\"additionalContext\": \"popcorn-harness is installed. Use /popcorn <task> to assemble and execute a capability harness from your available skills, agents, and commands.\"}'"
       }
     ]

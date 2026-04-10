@@ -63,7 +63,7 @@ After installation, run `/reload-plugins` if commands don't appear immediately.
 ### Claude Code — local development / testing
 
 ```bash
-claude --plugin-dir ./popcorn-harness
+claude --plugin-dir .
 ```
 
 Use `/reload-plugins` after making changes. The local copy takes precedence over any installed version.
