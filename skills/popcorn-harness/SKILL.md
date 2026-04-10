@@ -19,12 +19,14 @@ Given a task, pop the right capabilities together and execute — no manual tool
 - [scripts/detect-platform.sh](scripts/detect-platform.sh) — deterministic platform detection (outputs JSON)
 - [scripts/discover-capabilities.sh](scripts/discover-capabilities.sh) — capability discovery across all sources (outputs JSON)
 
-**Note on SKILL_DIR:** When scripts are referenced below, `SKILL_DIR` refers to the directory containing this SKILL.md. Common locations:
-- `~/.claude/plugins/popcorn-harness/skills/popcorn-harness/`
-- `~/.claude/skills/popcorn-harness/`
-- `~/.hermes/skills/popcorn-harness/`
+**Note on SKILL_DIR:** When scripts are referenced below, `SKILL_DIR` refers to the directory containing this SKILL.md. To determine the correct path, check in order:
+1. `~/.claude/plugins/popcorn-harness/skills/popcorn-harness/` (plugin install)
+2. `~/.claude/skills/popcorn-harness/` (manual install)
+3. `.claude/skills/popcorn-harness/` (project-level install)
+4. `~/.hermes/skills/popcorn-harness/` (Hermes install)
 
-Set it before running any script: `SKILL_DIR=~/.claude/plugins/popcorn-harness/skills/popcorn-harness`
+Use the first path where `SKILL.md` exists. Set it before running any script:
+`SKILL_DIR=<resolved path>`
 
 ---
 
@@ -44,12 +46,12 @@ Run the detection script first. It outputs JSON.
 
 ```bash
 bash "$SKILL_DIR/scripts/detect-platform.sh"
-# → {"platform":"claude-code","scope":"project","evidence":[...]}
+# -> {"platform":"claude-code","scope":"project","evidence":[...]}
 ```
 
 **Windows users:** bash scripts require WSL2 or Git Bash. If unavailable, skip the script and use the fallback table directly.
 
-If the script is unavailable (Hermes/OpenClaw context or no bash), use the fallback table:
+If the script exits non-zero or is not found, use the fallback table:
 
 | Signal | Platform |
 |--------|----------|
@@ -58,11 +60,13 @@ If the script is unavailable (Hermes/OpenClaw context or no bash), use the fallb
 | `available_skills` in system prompt, no `claude` CLI | Hermes |
 | Above + `OPENCLAW` env var set | OpenClaw |
 
-**Ambiguous detection → default to Hermes (context-based). Never halt.**
+**Ambiguous detection -> default to Hermes (context-based). Never halt.**
 
 ---
 
 ## Step 1 — Discover Capabilities
+
+**Note:** "Capabilities" in this skill means ALL items from the discovery output: `skills[]`, `agents[]`, and `commands[]`. Do not treat skills alone as the full capability set.
 
 ### Claude Code
 
@@ -70,7 +74,7 @@ Run the discovery script:
 
 ```bash
 bash "$SKILL_DIR/scripts/discover-capabilities.sh" --platform claude-code
-# → {"skills":[...],"agents":[...],"commands":[...],"sources":[...],"errors":[...]}
+# -> {"skills":[...],"agents":[...],"commands":[...],"sources":[...],"errors":[...]}
 ```
 
 Read the JSON output. The `errors` field lists what failed — surface it if critical.
@@ -82,7 +86,6 @@ Read the JSON output. The `errors` field lists what failed — surface it if cri
 Capabilities are already present in `available_skills` (injected in system prompt). Extract:
 1. All skill names + one-line descriptions from the injected block
 2. Categories (the indented structure)
-3. Active MCP tools in the current session
 
 **Zero results protocol:** same as above — report and halt.
 
@@ -92,25 +95,29 @@ Capabilities are already present in `available_skills` (injected in system promp
 
 Assess task complexity after discovery. For detailed edge cases, load [references/tier-decision-tree.md](references/tier-decision-tree.md).
 
-**Quick reference (exclusive boundaries):**
+**Quick reference (exclusive boundaries). Note: significant ambiguity overrides count — see tier-decision-tree.md.**
 
 | Condition | Tier |
 |-----------|------|
 | Exactly 1 capability, task unambiguous | **Tier 1 — Quick Pop** |
-| 2-3 capabilities, OR 1 with mild ambiguity | **Tier 2 — Standard Pop** |
-| 4-5 capabilities, OR significant ambiguity | **Tier 3 — Full Pop** |
+| 2-3 capabilities, no significant ambiguity | **Tier 2 — Standard Pop** |
+| 4-5 capabilities, OR significant ambiguity at any count | **Tier 3 — Full Pop** |
 
 ### Tier 1 — Quick Pop
 Announce, execute immediately. No confirmation.
 ```
-🍿 Popping: security-review
+🍿 Popping harness for: [task summary]
+Popping: security-review
 [executes]
 ```
 
 ### Tier 2 — Standard Pop
 Show plan. Wait for explicit confirmation before executing.
 ```
-🍿 Harness assembled:
+🍿 Popping harness for: [task summary]
+Platform: Claude Code (project)  |  Tier: 2 — Standard Pop
+
+Assembled harness:
   1. research-ops        — gather context
   2. security-review     — audit attack surface
   3. deployment-patterns — generate deploy checklist
@@ -121,14 +128,17 @@ Proceed? [y / n / adjust]
 ### Tier 3 — Full Pop
 Show full discovery + plan + pruning rationale. Require explicit confirmation.
 ```
-🍿 Discovered (Claude Code):
+🍿 Popping harness for: [task summary]
+Platform: Claude Code (project)  |  Tier: 3 — Full Pop
+
+Discovered:
   Skills:  security-review, e2e-testing, seo, deployment-patterns, docker-patterns
   Agents:  security-engineer
   Commands: /review
 
 Assembled harness (5 of 7):
   Phase 1 (parallel): security-review + e2e-testing + seo
-  Phase 2 (sequential): deployment-patterns → docker-patterns
+  Phase 2 (sequential): deployment-patterns -> docker-patterns
   Pruned: security-engineer (overlaps security-review), /review (redundant)
 
 Proceed? [y / n / adjust]
@@ -140,7 +150,7 @@ Proceed? [y / n / adjust]
 
 1. Re-display the current harness as a numbered list
 2. Ask: "Which capabilities to add, remove, or reorder? (e.g. 'remove 2, add docker-patterns')"
-3. Apply the requested change — validate the result is still within budget (≤5)
+3. Apply the requested change — validate the result is still within budget (<=5)
 4. Re-display the revised harness and ask "Proceed? [y / n / adjust]"
 5. Repeat until user confirms with `y` or cancels with `n`
 
@@ -154,7 +164,7 @@ For full graph patterns and parallel dispatch mechanics, load [references/assemb
 
 **Quick reference:**
 
-1. **Decompose** task into 2-6 independent sub-goals
+1. **Decompose** task into 2-5 independent sub-goals (matching the hard cap)
 2. **Map** each sub-goal to a capability — match on description content, not name alone
 3. **Graph** execution order: parallel if no shared state, sequential if B needs A's output
 4. **Enforce budget:** hard cap of 5 capabilities. If exceeded, prune lowest-relevance and report.
@@ -165,7 +175,7 @@ For full graph patterns and parallel dispatch mechanics, load [references/assemb
 
 ### Claude Code
 
-- **Skills:** read `SKILL.md` into context via file read tool, then follow its instructions
+- **Skills:** read `SKILL.md` into context via file read tool, then follow only its task-specific instructions. Skip the sub-skill's platform detection and tier selection — those are already handled.
 - **Agents:** spawn via Agent tool (`subagent_type: "general-purpose"`) with agent `.md` as system prompt
 - **Parallel:** spawn all Phase 1 agents simultaneously — do NOT await one before starting another
 - Full parallel dispatch syntax: see [references/assembly-patterns.md](references/assembly-patterns.md) § Parallel Dispatch
@@ -195,9 +205,16 @@ Platform: [detected]  |  Tier: [1/2/3] — [Quick/Standard/Full] Pop
   Key findings:  [what matters most across all outputs]
   Action items:  [concrete, specific next steps]
   Skipped:       [any failures or pruned capabilities, with reason]
+
+--- Plan B (only if budget was exceeded and a second run was proposed) ---
+  Remaining:  [capabilities deferred to next run]
+  Context to pass:  [copy this output block as input to the next /popcorn invocation]
 ```
 
-**Optional post-execution review:** spawn [agents/popcorn-critic.md](agents/popcorn-critic.md) with the above output + original task to get a quality verdict.
+**Post-execution review:** After any Tier 3 run, or when a capability returned an error, spawn the popcorn-critic agent to evaluate output quality. To invoke:
+- Spawn with `subagent_type: "general-purpose"`
+- Prompt: `[full content of popcorn-critic.md]\n\nOriginal task: [task]\n\nHarness output:\n[full Step 5 output block]`
+- The critic agent is installed alongside this skill (check `~/.claude/agents/popcorn-critic.md` or `./agents/popcorn-critic.md`)
 
 ---
 
@@ -206,10 +223,10 @@ Platform: [detected]  |  Tier: [1/2/3] — [Quick/Standard/Full] Pop
 1. Detect platform (Step 0) before anything else.
 2. Never hardcode skill lists — always discover dynamically.
 3. Announce platform and assembled harness at Tier 2+.
-4. Zero discovery results → halt and report. Do not hallucinate capabilities.
+4. Zero discovery results -> halt and report. Do not hallucinate capabilities.
 5. Hard cap: 5 capabilities. Prune explicitly with stated reason.
-6. Missing capability → report it, continue with what's available.
-7. Capability error → log inline, continue with remaining.
+6. Missing capability (not found at discovery time) -> report it, continue with what's available.
+7. Capability error (found but fails at runtime) -> log inline, continue with remaining. See tier-decision-tree.md § Tier Escalation for phase-critical error handling.
 8. Auto-execution without confirmation is only allowed at Tier 1.
 
 ---

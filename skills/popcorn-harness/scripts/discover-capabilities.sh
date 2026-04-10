@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # discover-capabilities.sh — Discover available skills, agents, and commands.
 # Outputs structured JSON to stdout. Silently skips unavailable sources.
-# Compatible with bash 3.x (macOS default) and bash 4+.
+# Requires bash 3.x+ (not POSIX sh).
 #
 # Usage: bash discover-capabilities.sh [--platform claude-code|hermes|openclaw]
-# Output: {"skills":[...],"agents":[...],"commands":[...],"sources":[...],"errors":[...]}
+# Output: {"platform":"...","skills":[...],"agents":[...],"commands":[...],"sources":[...],"errors":[...]}
 
 set -uo pipefail
 
@@ -20,28 +20,51 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Validate platform if explicitly provided
+if [[ -n "$PLATFORM" ]]; then
+  case "$PLATFORM" in
+    claude-code|hermes|openclaw) ;;
+    *)
+      printf '{"error":"unknown platform: %s. Expected: claude-code|hermes|openclaw"}\n' "$PLATFORM" >&2
+      exit 1
+      ;;
+  esac
+fi
+
+# Auto-detect platform if not provided
 if [[ -z "$PLATFORM" ]]; then
   SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
   detection="$(bash "$SCRIPT_DIR/detect-platform.sh" 2>/dev/null || printf '{"platform":"hermes"}')"
-  PLATFORM="$(printf '%s' "$detection" | grep -o '"platform":"[^"]*"' | cut -d'"' -f4)"
+  # Extract platform from JSON — anchored to "platform" key to avoid false matches in evidence array
+  PLATFORM="$(printf '%s' "$detection" | grep -o '"platform":"[^"]*"' | head -1 | cut -d'"' -f4)"
+  if [[ -z "$PLATFORM" ]]; then
+    PLATFORM="hermes"
+    ERRORS+=("detect-platform.sh returned unparseable output; defaulting to hermes")
+  fi
 fi
 
-# JSON-safe string escaping (no jq dependency, bash 3.x compatible)
+# JSON-safe string escaping (bash 3.x compatible)
 json_escape() {
   local s="$1"
   s="${s//\\/\\\\}"
   s="${s//\"/\\\"}"
+  s="${s//$'\t'/\\t}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
   printf '%s' "$s"
 }
 
 # Dedup tracking via tmp file (bash 3.x: no associative arrays)
-TMPDIR_DEDUP="$(mktemp -d)"
-trap 'rm -rf "$TMPDIR_DEDUP"' EXIT
+TMPDIR_DEDUP="$(mktemp -d)" || {
+  printf '{"error":"mktemp failed: cannot create temp dir"}\n' >&2
+  exit 1
+}
+trap 'rm -rf "$TMPDIR_DEDUP"' EXIT INT TERM
 _seen_file="$TMPDIR_DEDUP/seen"
 touch "$_seen_file"
 
-is_seen() { grep -qxF "$1:$2" "$_seen_file" 2>/dev/null; }
-mark_seen() { printf '%s:%s\n' "$1" "$2" >> "$_seen_file"; }
+is_seen() { grep -qxF "$1:$(json_escape "$2")" "$_seen_file" 2>/dev/null; }
+mark_seen() { printf '%s\n' "$1:$(json_escape "$2")" >> "$_seen_file"; }
 
 SKILLS=()
 AGENTS=()
@@ -52,22 +75,22 @@ ERRORS=()
 add_skill() {
   local name; name="$(json_escape "$1")"
   local src;  src="$(json_escape "$2")"
-  is_seen "skill" "$name" && return 0
-  mark_seen "skill" "$name"
+  is_seen "skill" "$1" && return 0
+  mark_seen "skill" "$1"
   SKILLS+=("{\"name\":\"$name\",\"source\":\"$src\"}")
 }
 add_agent() {
   local name; name="$(json_escape "$1")"
   local src;  src="$(json_escape "$2")"
-  is_seen "agent" "$name" && return 0
-  mark_seen "agent" "$name"
+  is_seen "agent" "$1" && return 0
+  mark_seen "agent" "$1"
   AGENTS+=("{\"name\":\"$name\",\"source\":\"$src\"}")
 }
 add_cmd() {
   local name; name="$(json_escape "$1")"
   local src;  src="$(json_escape "$2")"
-  is_seen "cmd" "$name" && return 0
-  mark_seen "cmd" "$name"
+  is_seen "cmd" "$1" && return 0
+  mark_seen "cmd" "$1"
   COMMANDS+=("{\"name\":\"$name\",\"source\":\"$src\"}")
 }
 
@@ -126,19 +149,18 @@ if [[ "$PLATFORM" == "claude-code" ]]; then
     cmds_before=${#COMMANDS[@]}
     while IFS= read -r f; do
       add_cmd "$(basename "$f" .md)" "fs:$cmd_dir"
-    done < <(find "$cmd_dir" -name "*.md" -not -name ".*" 2>/dev/null || true)
+    done < <(find "$cmd_dir" -maxdepth 2 -name "*.md" -not -name ".*" 2>/dev/null || true)
     [[ ${#COMMANDS[@]} -gt $cmds_before ]] && SOURCES+=("commands-dir:$(json_escape "$cmd_dir")")
   done
 
 # ─── Hermes / OpenClaw ────────────────────────────────────────────────────────
 else
   SOURCES+=("system-prompt-injection")
-  ERRORS+=("hermes-openclaw: capabilities are in available_skills context — read them from the injected system prompt, not this script.")
+  ERRORS+=("hermes-openclaw: capabilities are in available_skills context -- read them from the injected system prompt, not this script.")
 fi
 
 # ─── JSON output ─────────────────────────────────────────────────────────────
 join_obj_arr() {
-  # joins pre-encoded JSON objects
   local result="["
   local first=1
   for v in "$@"; do

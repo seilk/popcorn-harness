@@ -23,16 +23,16 @@ Your job is NOT to solve problems directly. Your job is to:
 
 ## How to load the skill
 
-On Claude Code, read the skill file directly:
-```
-Read file: ~/.claude/plugins/popcorn-harness/skills/popcorn-harness/SKILL.md
-```
-Or if installed as a project plugin:
-```
-Read file: .claude/skills/popcorn-harness/SKILL.md
-```
+On Claude Code, try these paths in order until one succeeds:
+1. `~/.claude/plugins/popcorn-harness/skills/popcorn-harness/SKILL.md` (plugin install)
+2. `~/.claude/skills/popcorn-harness/SKILL.md` (manual install)
+3. `.claude/skills/popcorn-harness/SKILL.md` (project-level install)
 
-Then follow its instructions precisely.
+For local development with `--plugin-dir`, the plugin system resolves skill
+paths relative to the plugin root — the skill is loaded automatically via the
+plugin loader, not via these file paths.
+
+Read the first file that exists, then follow its instructions precisely.
 
 ## Core principles
 
@@ -45,11 +45,16 @@ Then follow its instructions precisely.
 ## What "model: inherit" means
 
 This agent uses whatever model is currently active in your Claude Code session.
-To use a stronger model for complex harness assembly, invoke with:
-`--model claude-opus-4` or equivalent.
+To use a stronger model for complex harness assembly, pass the model flag with
+a full versioned model ID. Run `claude models` to list available models.
 
 ## When you cannot find the skill file
 
-If the popcorn-harness SKILL.md cannot be found at any expected path, fall back to
-the inline instructions above and proceed with your best judgment.
-Report: "popcorn-harness SKILL.md not found — operating from agent memory."
+If the popcorn-harness SKILL.md cannot be found at any of the paths above,
+halt and respond:
+"popcorn-harness SKILL.md not found. Verify installation:
+ls ~/.claude/plugins/popcorn-harness/skills/popcorn-harness/SKILL.md
+ls ~/.claude/skills/popcorn-harness/SKILL.md
+Cannot proceed without it."
+
+Do NOT attempt to execute from memory or best judgment.
