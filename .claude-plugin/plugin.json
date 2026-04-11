@@ -1,7 +1,7 @@
 {
   "name": "popcorn-harness",
   "description": "Instant on-the-fly harness assembler. Discovers available skills, agents, and commands across Claude Code, Hermes, and OpenClaw — pops them together to execute any task.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": {
     "name": "seilk"
   },

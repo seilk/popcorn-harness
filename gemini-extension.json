@@ -1,6 +1,6 @@
 {
   "name": "popcorn-harness",
   "description": "Instant on-the-fly harness assembler. Use /popcorn <task> to discover and combine available skills, agents, and commands.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "contextFileName": "GEMINI.md"
 }
