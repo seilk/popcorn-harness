@@ -1,6 +1,6 @@
 ---
-name: popcorn
-description: "Instant harness assembler — discovers available skills, agents, and commands, pops them together, and executes your task. Usage: /popcorn <task description>"
+name: popcorn-harness
+description: "Instant harness assembler — discovers available skills, agents, and commands, pops them together, and executes your task. Usage: /popcorn-harness <task description>"
 ---
 
 This command is Claude Code only. On Hermes/OpenClaw, use: `popcorn — <task>`
