@@ -28,5 +28,14 @@
     "orchestration",
     "multi-agent",
     "automation"
+  ],
+  "commands": [
+    "./commands/"
+  ],
+  "skills": [
+    "./skills/"
+  ],
+  "agents": [
+    "./agents/"
   ]
 }
